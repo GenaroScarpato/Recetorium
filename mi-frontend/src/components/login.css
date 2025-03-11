@@ -1,0 +1,269 @@
+
+
+
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: absolute; /* Para que quede encima de todo */
+  top: 0;
+  left: 0;
+  z-index: 999;  /* Para que quede encima del fondo */
+}
+
+
+.login-wrapper {
+  background: rgba(0, 0, 0, 0.7); 
+  color: #fff;
+  max-width: 500px;
+  min-height: 30px;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;  /* Agregar z-index alto para asegurarse de que quede por encima */
+  position: relative;
+}
+s
+
+h2 {
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #fff;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+form div {
+  margin-bottom: 15px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  color: #fff;
+  background: none;
+}
+
+input:focus {
+  border: 1px solid #4CAF50;
+}
+
+button {
+  padding: 12px;
+  background-color: transparent;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #fff;
+  color: #000;
+}
+
+p {
+  font-size: 1rem;
+  margin-top: 10px;
+  color: #ff4757;
+}
+
+span {
+  cursor: pointer;
+  color: #1e90ff; /* Color azul para los enlaces */
+}
+
+.form-actions {
+  margin-top: 20px;
+}
+
+.form-actions p {
+  font-size: 1rem;
+  color: #ffffff;
+}
+dashboard.css
+/* Estilos Generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    min-height: 100vh;
+    display: block;
+}
+
+/* Contenedor principal */
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-top: 60px; /* Añadido para evitar que el contenido quede debajo del header fijo */
+}
+
+/* Encabezado */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 100;
+}
+
+.header-title {
+    font-size: 1.5rem;
+}
+
+
+
+.login-logout-btn:hover {
+    background-color: #e84118;
+}
+.login-logout-btn {
+  background-color: #2f3542; /* Fondo oscuro para hacerlo más visible */
+  color: white;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.5rem;
+  color: #fff;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #ff4757; /* Cambia el color al pasar el ratón */
+}
+
+
+/* Contenedor principal con sidebar y contenido */
+.main-content {
+    display: flex;
+    margin-top: 60px; /* Para que no se superponga el contenido debajo del encabezado fijo */
+    height: calc(100vh - 60px); /* Restamos la altura del header */
+}
+
+/* Menú lateral */
+.sidebar {
+    width: 250px;
+    background-color: #2f3542;
+    padding: 20px;
+    height: 100%;
+    position: fixed;
+    top: 60px; /* Para que no se superponga con el encabezado */
+    left: 0;
+    bottom: 0;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 15px;
+}
+
+.sidebar ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+.sidebar ul li a:hover {
+    color: #ff4757;
+}
+
+/* Contenido central (recetas) */
+.content {
+    flex-grow: 1;
+    margin-left: 250px; /* Para dar espacio al sidebar */
+    padding: 20px;
+    overflow-y: auto;
+    color: #333;
+}
+
+/* Estilos de las recetas */
+.recipes-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px; /* Espacio entre las recetas */
+    margin-top: 20px;
+}
+
+.recipe-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.recipe-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.recipe-card img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.recipe-card h3 {
+    font-size: 1.2rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.recipe-card p {
+    font-size: 0.9rem;
+    color: #777;
+    text-align: center;
+}
+
+/* Añadido para mejorar el espaciado y el layout */
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column; /* En pantallas pequeñas, el sidebar y el contenido se apilan verticalmente */
+    }
+    
+    .sidebar {
+        position: relative; /* Cambié a relative para que el sidebar no se fije en pantallas pequeñas */
+        height: auto; /* Permite que el sidebar tenga altura variable en pantallas pequeñas */
+        width: 100%;
+    }
+
+    .content {
+        margin-left: 0;
+    }
+}

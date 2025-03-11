@@ -1,0 +1,158 @@
+/* Estilos Generales */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f4;
+  min-height: 100vh;
+}
+
+/* Contenedor principal */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-top: 60px; /* Para evitar que el contenido quede debajo del header */
+}
+
+/* Encabezado */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+.header-icon {
+  width: 100px;
+  height: 50px;
+}
+
+/* Botones de autenticación */
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.login-btn,
+.register-btn,
+.logout-btn {
+  padding: 10px 20px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-btn {
+  background-color: #3498db;
+}
+
+.login-btn:hover {
+  background-color: #2980b9;
+}
+
+.register-btn {
+  background-color: #2ecc71;
+}
+
+.register-btn:hover {
+  background-color: #27ae60;
+}
+
+.logout-btn {
+  background-color: #e74c3c;
+}
+
+.logout-btn:hover {
+  background-color: #c0392b;
+}
+
+/* Contenedor principal con sidebar y contenido */
+.main-content {
+  display: flex;
+  margin-top: 60px; /* Para evitar que el contenido se superponga con el header */
+  height: calc(100vh - 60px);
+}
+
+/* Menú lateral (sidebar) */
+.sidebar {
+  width: 250px;
+  background-color: #2f3542;
+  padding: 20px;
+  height: 100%;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto; /* Para permitir el desplazamiento si hay muchos filtros */
+}
+
+/* Estilos para los grupos de filtros */
+.filter-group {
+  background-color: #3b4252;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.filter-group h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #fff;
+}
+
+.filter-label {
+  display: flex;
+  justify-content: space-between; /* Alinea el texto a la izquierda y el checkbox a la derecha */
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #fff;
+}
+
+.filter-label input {
+  margin-left: 8px; /* Mueve el checkbox a la derecha */
+  cursor: pointer;
+}
+
+/* Contenido central (recetas) */
+.content {
+  flex-grow: 1;
+  margin-left: 250px; /* Para dar espacio al sidebar */
+  padding: 20px;
+  overflow-y: auto;
+  color: #333;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    top: 0;
+  }
+
+  .content {
+    margin-left: 0;
+  }
+}
