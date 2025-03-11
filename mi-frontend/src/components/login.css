@@ -267,3 +267,14 @@ body {
         margin-left: 0;
     }
 }
+/* Estilos para el mensaje de éxito */
+.success-message {
+  color: #4CAF50; /* Color verde para el mensaje de éxito */
+  font-size: 1rem;
+  margin-top: 10px;
+  text-align: center;
+  padding: 10px;
+  background-color: rgba(76, 175, 80, 0.1); /* Fondo verde claro */
+  border-radius: 4px;
+  border: 1px solid #4CAF50;
+}

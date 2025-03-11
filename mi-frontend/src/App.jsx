@@ -1,8 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Dashboard from './components/Dashboard';
-import RecipeDetails from './components/RecipeDetails'; // Correcto
-// // import ProtectedRoute from './components/ProtectedRoute'; // Si necesitas rutas protegidas
+import RecipeDetails from './components/RecipeDetails';
+import Login from './components/Login'; // Importa el componente Login
 
 function App() {
   return (
@@ -14,17 +14,8 @@ function App() {
         {/* Ruta para los detalles de la receta */}
         <Route path="/receta/:id" element={<RecipeDetails />} />
 
-        {/* Si necesitas rutas protegidas, puedes usar ProtectedRoute */}
-        {/* Ejemplo:
-        <Route
-          path="/ruta-protegida"
-          element={
-            <ProtectedRoute>
-              <ComponenteProtegido />
-            </ProtectedRoute>
-          }
-        />
-        */}
+        {/* Ruta para el inicio de sesión */}
+        <Route path="/login" element={<Login setShowLogin={() => {}} />} />
       </Routes>
     </AuthProvider>
   );

@@ -32,7 +32,7 @@ const getUsuarioById = async (req, res) => {
 
 const addUsuario = async (req, res) => {
     try {
-        const { username, password, role } = req.body;
+        const { username, password, role = 'CLIENTE' } = req.body; // Asigna 'CLIENTE' por defecto
 
         // Verificar si el usuario ya existe
         const existeUsuario = await usuarioModel.getByName(username);
@@ -74,7 +74,7 @@ const addUsuario = async (req, res) => {
         const nuevoUsuario = { 
             username, 
             password, 
-            role,
+            role, // Aquí se usa el valor por defecto si no se proporciona
             foto: fotoUrl || 'url_default_foto_perfil'  // URL por defecto si no se sube foto
         };
 
@@ -90,7 +90,7 @@ const addUsuario = async (req, res) => {
             error: error.message
         });
     }
-}
+};
 
 const updateById = async (req, res) => {
     const { id } = req.params;

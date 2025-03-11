@@ -12,6 +12,7 @@ export function AuthProvider({ children }) {
     console.log("Inicialización del estado - storedUser:", storedUser, "storedRole:", storedRole, "storedId:", storedId);
     return storedUser && storedRole && storedId ? { username: storedUser, role: storedRole, id: storedId } : null;
   });
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const storedRole = localStorage.getItem('role');

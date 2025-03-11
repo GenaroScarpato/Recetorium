@@ -6,11 +6,13 @@ import RecipeCard from './RecipeCard';
 import UserInfo from './UserInfo';
 import './Dashboard.css';
 import axios from 'axios';
+import Register from './Register';
 
 const Dashboard = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const [recetas, setRecetas] = useState([]);
   const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
   const [showUserInfo, setShowUserInfo] = useState(false);
   const [userData, setUserData] = useState(null);
   const [filters, setFilters] = useState({
@@ -106,7 +108,9 @@ const Dashboard = () => {
               <button className="login-btn" onClick={() => setShowLogin(true)}>
                 Login
               </button>
-              <button className="register-btn">Register</button>
+              <button className="register-btn" onClick={() => setShowRegister(true)}>
+  Register
+</button>
             </>
           )}
         </div>
@@ -176,6 +180,8 @@ const Dashboard = () => {
 
       {showLogin && <Login setShowLogin={setShowLogin} />}
       {showUserInfo && <UserInfo user={userData} onClose={() => setShowUserInfo(false)} />}
+      {showRegister && <Register setShowRegister={setShowRegister} />}
+        
     </div>
   );
 };
