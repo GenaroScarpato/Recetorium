@@ -101,23 +101,38 @@ const add = async (req, res) => {
 const addMany = async (req, res) => {
     try {
         const nuevosIngredientes = req.body; // Obtiene el array de ingredientes del cuerpo de la petición
-        const ingredientesActualizados = await Promise.all(
+
+        // Verificar y agregar solo los ingredientes que no existen
+        const ingredientesAgregados = await Promise.all(
             nuevosIngredientes.map(async (nuevoIngrediente) => {
-                return await ingredientesModel.add(nuevoIngrediente);
+                const { nombre } = nuevoIngrediente;
+
+                // Verificar si el ingrediente ya existe
+                const ingredienteExistente = await ingredientesModel.getByName(nombre);
+
+                if (!ingredienteExistente) {
+                    // Si no existe, lo agregamos a la base de datos
+                    return await ingredientesModel.add(nuevoIngrediente);
+                }
+                return null; // Si existe, retornamos null
             })
         );
-        
+
+        // Filtramos los valores nulos (ingredientes duplicados)
+        const ingredientesAgregadosFiltrados = ingredientesAgregados.filter(ingrediente => ingrediente !== null);
+
+        // Respuesta con los ingredientes agregados
         res.status(201).json({
             message: 'Ingredientes agregados exitosamente',
-            ingredientes: ingredientesActualizados // Retorna el array actualizado
+            ingredientes: ingredientesAgregadosFiltrados, // Lista de ingredientes agregados
         });
     } catch (error) {
         res.status(500).json({
             message: 'Hubo un error al agregar los ingredientes',
-            error: error.message
+            error: error.message,
         });
     }
-}
+};
 
 
 module.exports = {
