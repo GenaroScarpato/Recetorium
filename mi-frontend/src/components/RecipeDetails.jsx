@@ -13,7 +13,6 @@ const RecipeDetails = () => {
   useEffect(() => {
     axios.get(`http://localhost:3000/api/recetas/${id}`)
       .then((response) => {
-        console.log("Respuesta del backend:", response.data);
         setReceta(response.data);
         setLoading(false);
       })
@@ -69,8 +68,9 @@ const RecipeDetails = () => {
               {receta.ingredientes && receta.ingredientes.length > 0 ? (
                 receta.ingredientes.map((ingrediente, index) => (
                   <li key={index} className={styles.ingredienteItem}>
-                    <span className={styles.ingredienteNombre}>{ingrediente.ingrediente?.nombre || "Ingrediente desconocido"}</span>
-                    <span className={styles.ingredienteCantidad}>{ingrediente.cantidad} {ingrediente.unidad}</span>
+                    <span className={styles.ingredienteNombre }>{ingrediente.ingrediente?.nombre || "Ingrediente desconocido"}</span>
+                    {": "}
+                    <span className={styles.ingredienteCantidad }>{ingrediente.cantidad} {ingrediente.unidad}</span>
                   </li>
                 ))
               ) : (

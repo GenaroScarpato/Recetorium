@@ -21,19 +21,23 @@ const Dashboard = () => {
     ingredientePrincipal: [],
   });
   const navigate = useNavigate();
+  
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/recetas')
+    fetch('http://localhost:3000/api/recetas' , {
+      credentials: 'include', // Incluir cookies en la solicitud
+    })
       .then((response) => response.json())
       .then((data) => setRecetas(data))
       .catch((error) => console.error('Error al obtener las recetas:', error));
   }, []);
 
   const handleLogout = () => {
+
     logout();
     navigate('/');
+  
   };
-
   const handleFilterChange = (filterType, value) => {
     setFilters((prevFilters) => {
       const updatedFilters = { ...prevFilters };
@@ -47,26 +51,18 @@ const Dashboard = () => {
   };
 
   const handleUserInfoClick = async () => {
-    console.log("handleUserInfoClick ejecutado");
     try {
-      console.log("Llamando a la API para obtener datos del usuario con ID:", user.id);
-  
-      // Obtener el token del localStorage
-      const token = localStorage.getItem('token');
       
-      // Hacer la solicitud con el token en el encabezado
       const response = await axios.get(`http://localhost:3000/api/usuarios/${user.id}`, {
-        headers: {
-         'x-token': token,   },
+        withCredentials: true, // Asegúrate de incluir las cookies
       });
   
-      console.log("Respuesta de la API:", response.data);
       setUserData(response.data);
       setShowUserInfo(true);
     } catch (error) {
       if (error.response && error.response.status === 401) {
         console.error('No autorizado: Token inválido o expirado');
-        alert('No autorizado: Por favor, inicia sesión nuevamente.'); // O muestra un mensaje en la interfaz de usuario
+        alert('No autorizado: Por favor, inicia sesión nuevamente.');
       } else {
         console.error('Error al obtener los datos del usuario:', error);
       }
@@ -96,9 +92,9 @@ const Dashboard = () => {
         <div className="auth-buttons">
           {isAuthenticated && user ? ( // Verifica que el usuario esté autenticado y que `user` no sea null
             <div className="user-info">
-              <span className="user-name" onClick={handleUserInfoClick}>
+              <button className="user-name" onClick={handleUserInfoClick}>
                 Bienvenido, {user.username} {/* Accede a `user.username` solo si `user` no es null */}
-              </span>
+              </button>
               <button onClick={handleLogout} className="logout-btn">
                 Logout
               </button>
@@ -166,16 +162,16 @@ const Dashboard = () => {
         </div>
 
         <div className="content">
-          {filteredRecetas.length > 0 ? (
-            <div className="recipes-list">
-              {filteredRecetas.map((receta) => (
-                <RecipeCard key={receta._id} receta={receta} />
-              ))}
-            </div>
-          ) : (
-            <p>No hay recetas que coincidan con los filtros seleccionados.</p>
-          )}
-        </div>
+  {filteredRecetas.length > 0 ? (
+    <div className="recipes-list">
+      {filteredRecetas.map((receta) => (
+        <RecipeCard key={receta._id} receta={receta} />
+      ))}
+    </div>
+  ) : (
+    <p>No hay recetas que coincidan con los filtros seleccionados.</p>
+  )}
+</div>
       </div>
 
       {showLogin && <Login setShowLogin={setShowLogin} />}

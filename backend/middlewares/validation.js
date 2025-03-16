@@ -3,22 +3,23 @@ const jwt = require('jsonwebtoken');
 const { Usuario } = require('../models/usuarioModel');
 
 const validarJwt = async (req, res, next) => {
-    const token = req.header('x-token');
+    const token = req.cookies.token; // Extrae el token de las cookies
 
     if (!token) {
         return res.status(401).json({
-            msg: 'Necesita  logearse para realizar esta acción'
+            msg: 'Necesita logearse para realizar esta acción'
         });
     }
 
     try {
         // Verificar el token
-        const {id} = jwt.verify(token, process.env.SECRETORPRIVATEKEY);
+        const { id } = jwt.verify(token, process.env.SECRETORPRIVATEKEY);
         if (!id) {
             return res.status(401).json({
                 msg: 'Token no válido - No se encontró un _id en el token'
             });
-        }        
+        }
+
         const usuario = await Usuario.findById({ _id: id });
         if (!usuario) {
             return res.status(401).json({
@@ -30,14 +31,12 @@ const validarJwt = async (req, res, next) => {
         req.usuario = usuario;
 
         next();
-
     } catch (error) {
         res.status(401).json({
             msg: 'Token no válido'
         });
     }
 };
-
 
 const validarAdmin = async(req, resp, next) => {
     const usuario = req.usuario;     

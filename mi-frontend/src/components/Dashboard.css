@@ -18,7 +18,15 @@ body {
   width: 100%;
   padding-top: 60px; /* Para evitar que el contenido quede debajo del header */
 }
-
+/* Estilos para la lista de recetas */
+/* Estilos para la lista de recetas */
+.recipes-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Columnas responsivas */
+  gap: 20px; /* Espacio entre las tarjetas */
+  margin-top: 20px;
+  padding: 20px; /* Espaciado interno */
+}
 /* Encabezado */
 .header {
   display: flex;

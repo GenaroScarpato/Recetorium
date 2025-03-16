@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import './RecipeCard.module.css';
+import styles from './RecipeCard.module.css'; // Importar CSS Modules
 
 const RecipeCard = ({ receta }) => {
   const navigate = useNavigate();
@@ -10,13 +10,13 @@ const RecipeCard = ({ receta }) => {
   };
 
   return (
-    <div className="recipe-card" onClick={handleClick}>
-      <img src={receta.foto} alt={receta.nombre} className="recipe-image" />
-      <div className="recipe-details">
-        <h3 className="recipe-name">{receta.nombre}</h3>
-        <div className="recipe-meta">
-          <span className="recipe-time">⏱️ {receta.tiempoPreparacion}</span>
-          <span className="recipe-difficulty">⚙️ {receta.nivelDificultad}</span>
+    <div className={styles['recipe-card']} onClick={handleClick}>
+      <img src={receta.foto} alt={receta.nombre} className={styles['recipe-image']} />
+      <div className={styles['recipe-details']}>
+        <h3 className={styles['recipe-name']}>{receta.nombre}</h3>
+        <div className={styles['recipe-meta']}>
+          <span className={styles['recipe-time']}>⏱️ {receta.tiempoPreparacion}</span>
+          <span className={styles['recipe-difficulty']}>⚙️ {receta.nivelDificultad}</span>
         </div>
       </div>
     </div>
@@ -28,7 +28,7 @@ RecipeCard.propTypes = {
     _id: PropTypes.string.isRequired,
     foto: PropTypes.string.isRequired,
     nombre: PropTypes.string.isRequired,
-    descripcion: PropTypes.string, // Cambiado a no requerido
+    descripcion: PropTypes.string,
     tiempoPreparacion: PropTypes.string.isRequired,
     nivelDificultad: PropTypes.string.isRequired,
   }).isRequired,
