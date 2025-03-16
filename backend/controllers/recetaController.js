@@ -101,38 +101,50 @@ const updateById = async (req, res) => {
 };
 const add = async (req, res) => {
     try {
-        // Verifica si se subió una imagen
-        if (!req.files || !req.files.foto) {
-            return res.status(400).json({ error: 'No se subió ninguna imagen' });
-        }
+        let fotoUrl = null;
 
-        const file = req.files.foto;
+        // Caso 1: Si se sube un archivo de imagen
+        if (req.files && req.files.foto) {
+            const file = req.files.foto;
 
-        // Verifica si el archivo tiene una ruta temporal
-        if (!file.tempFilePath) {
-            return res.status(400).json({ error: 'El archivo de imagen no es válido' });
-        }
-
-        // Sube la nueva imagen a Cloudinary
-        const result = await cloudinary.uploader.upload(file.tempFilePath, {
-            folder: 'recetas', // Opcional: Organiza las imágenes en una carpeta
-        });
-
-        // Parsea el campo "ingredientes" (que es un JSON stringificado) a un array de objetos
-        let ingredientesArray = [];
-        if (req.body.ingredientes) {
-            try {
-                ingredientesArray = JSON.parse(req.body.ingredientes);
-            } catch (error) {
-                return res.status(400).json({ error: 'El campo "ingredientes" no es un JSON válido' });
+            // Verifica si el archivo tiene una ruta temporal
+            if (!file.tempFilePath) {
+                return res.status(400).json({ error: 'El archivo de imagen no es válido' });
             }
+
+            // Sube la nueva imagen a Cloudinary
+            const result = await cloudinary.uploader.upload(file.tempFilePath, {
+                folder: 'recetas', // Opcional: Organiza las imágenes en una carpeta
+            });
+
+            // Elimina el archivo temporal después de subirlo a Cloudinary
+            fs.unlink(file.tempFilePath, (err) => {
+                if (err) {
+                    console.error("Error al eliminar el archivo temporal:", err);
+                } else {
+                    console.log("Archivo temporal eliminado:", file.tempFilePath);
+                }
+            });
+
+            fotoUrl = result.secure_url; // URL de la imagen subida a Cloudinary
+        }
+        // Caso 2: Si se proporciona una URL de imagen directamente
+        else if (req.body.foto) {
+            fotoUrl = req.body.foto; // Usa la URL proporcionada en el cuerpo de la solicitud
+        }
+        // Caso 3: Si no se proporciona ninguna imagen
+        else {
+            fotoUrl = 'https://ejemplo.com/imagen-predeterminada.jpg'; // URL de imagen predeterminada
         }
 
-        // Crea la receta con la URL de la imagen y los ingredientes parseados
+        // Asegúrate de que "ingredientes" sea un array
+        let ingredientesArray = Array.isArray(req.body.ingredientes) ? req.body.ingredientes : [];
+
+        // Crea la receta con la URL de la imagen y los ingredientes
         const nuevaReceta = {
             ...req.body, // Todos los campos de la receta
-            foto: result.secure_url, // URL de la imagen subida a Cloudinary
-            ingredientes: ingredientesArray, // Usar el array parseado
+            foto: fotoUrl, // URL de la imagen (subida a Cloudinary, proporcionada o predeterminada)
+            ingredientes: ingredientesArray, // Usar el array de ingredientes
         };
 
         // Guarda la receta en la base de datos

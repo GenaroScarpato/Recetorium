@@ -14,22 +14,30 @@ export function AuthProvider({ children }) {
         const response = await fetch('http://localhost:3000/api/verify-auth', {
           credentials: 'include', // Incluir cookies en la solicitud
         });
-
+  
         if (response.ok) {
           const data = await response.json();
           setIsAuthenticated(true);
-          setUser(data.user); // Actualizar el estado del usuario con los datos del backend
+          setUser(data.user);
+        } else if (response.status === 401) {
+          // Si el servidor responde con 401, el usuario no está autenticado
+          setIsAuthenticated(false);
+          setUser(null);
+          // No mostramos el error en la consola
         } else {
+          // Otros errores
+          console.error('Error al verificar autenticación:', response.statusText);
           setIsAuthenticated(false);
           setUser(null);
         }
       } catch (error) {
+        // Errores de red u otros errores
         console.error('Error al verificar autenticación:', error);
         setIsAuthenticated(false);
         setUser(null);
       }
     };
-
+  
     verifyAuth();
   }, []);
 
@@ -51,7 +59,7 @@ export function AuthProvider({ children }) {
         method: 'POST',
         credentials: 'include', // Incluir cookies en la solicitud
       });
-  
+
       if (response.ok) {
         setIsAuthenticated(false);
         setUser(null);
@@ -62,6 +70,7 @@ export function AuthProvider({ children }) {
       console.error('Error al cerrar sesión:', error);
     }
   };
+
   return (
     <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
       {children}

@@ -18,13 +18,32 @@ const Dashboard = () => {
   const [filters, setFilters] = useState({
     tipoComida: [],
     nivelDificultad: [],
-    ingredientePrincipal: [],
+    ingredientes: [], // Cambiamos "ingredientePrincipal" a "ingredientes"
   });
+  const [searchIngredient, setSearchIngredient] = useState('');
+  const [ingredientesDisponibles, setIngredientesDisponibles] = useState([]); // Estado para almacenar los ingredientes
   const navigate = useNavigate();
-  
 
+  // Obtener los ingredientes desde la API
   useEffect(() => {
-    fetch('http://localhost:3000/api/recetas' , {
+    fetch('http://localhost:3000/api/ingredientes')
+      .then((response) => response.json())
+      .then((data) => {
+        // Extraer solo los nombres de los ingredientes
+        const nombresIngredientes = data.map((ingrediente) => ingrediente.nombre);
+        setIngredientesDisponibles(nombresIngredientes);
+      })
+      .catch((error) => console.error('Error al obtener los ingredientes:', error));
+  }, []);
+
+  // Filtrar ingredientes según la búsqueda
+  const ingredientesFiltrados = ingredientesDisponibles.filter((ingrediente) =>
+    ingrediente.toLowerCase().includes(searchIngredient.toLowerCase())
+  );
+
+  // Obtener las recetas desde la API
+  useEffect(() => {
+    fetch('http://localhost:3000/api/recetas', {
       credentials: 'include', // Incluir cookies en la solicitud
     })
       .then((response) => response.json())
@@ -32,31 +51,33 @@ const Dashboard = () => {
       .catch((error) => console.error('Error al obtener las recetas:', error));
   }, []);
 
+  // Función para manejar el cierre de sesión
   const handleLogout = () => {
-
     logout();
     navigate('/');
-  
   };
+
+  // Función para manejar cambios en los filtros
   const handleFilterChange = (filterType, value) => {
     setFilters((prevFilters) => {
       const updatedFilters = { ...prevFilters };
       if (updatedFilters[filterType].includes(value)) {
+        // Si el valor ya está en los filtros, lo removemos
         updatedFilters[filterType] = updatedFilters[filterType].filter((item) => item !== value);
       } else {
+        // Si el valor no está en los filtros, lo agregamos
         updatedFilters[filterType] = [...updatedFilters[filterType], value];
       }
       return updatedFilters;
     });
   };
 
+  // Función para mostrar la información del usuario
   const handleUserInfoClick = async () => {
     try {
-      
       const response = await axios.get(`http://localhost:3000/api/usuarios/${user.id}`, {
         withCredentials: true, // Asegúrate de incluir las cookies
       });
-  
       setUserData(response.data);
       setShowUserInfo(true);
     } catch (error) {
@@ -69,19 +90,20 @@ const Dashboard = () => {
     }
   };
 
+  // Función de filtrado corregida
   const filteredRecetas = recetas.filter((receta) => {
-    if (
-      filters.tipoComida.length === 0 &&
-      filters.nivelDificultad.length === 0 &&
-      filters.ingredientePrincipal.length === 0
-    ) {
-      return true;
-    }
+    // Verificar si la receta contiene todos los ingredientes seleccionados
+    const contieneTodosLosIngredientes = filters.ingredientes.every((ingredienteSeleccionado) => {
+      return receta.ingredientes.some((ingredienteReceta) => 
+        ingredienteReceta.ingrediente.nombre === ingredienteSeleccionado
+      );
+    });
 
+    // Verificar si la receta cumple con todos los filtros
     return (
       (filters.tipoComida.length === 0 || filters.tipoComida.includes(receta.tipoComida)) &&
       (filters.nivelDificultad.length === 0 || filters.nivelDificultad.includes(receta.nivelDificultad)) &&
-      (filters.ingredientePrincipal.length === 0 || filters.ingredientePrincipal.includes(receta.ingredientePrincipal))
+      (filters.ingredientes.length === 0 || contieneTodosLosIngredientes)
     );
   });
 
@@ -90,10 +112,10 @@ const Dashboard = () => {
       <div className="header">
         <img src="../public/icono.png" alt="Icono" className="header-icon" />
         <div className="auth-buttons">
-          {isAuthenticated && user ? ( // Verifica que el usuario esté autenticado y que `user` no sea null
+          {isAuthenticated && user ? (
             <div className="user-info">
               <button className="user-name" onClick={handleUserInfoClick}>
-                Bienvenido, {user.username} {/* Accede a `user.username` solo si `user` no es null */}
+                Bienvenido, {user.username}
               </button>
               <button onClick={handleLogout} className="logout-btn">
                 Logout
@@ -105,8 +127,8 @@ const Dashboard = () => {
                 Login
               </button>
               <button className="register-btn" onClick={() => setShowRegister(true)}>
-  Register
-</button>
+                Register
+              </button>
             </>
           )}
         </div>
@@ -146,15 +168,20 @@ const Dashboard = () => {
           </div>
 
           <div className="filter-group">
-            <h4>Ingrediente Principal</h4>
-            {['Carne', 'Pollo', 'Pescado', 'Verduras', 'Frutas', 'Granos', 'Mariscos'].map((ingrediente) => (
+            <h4>Ingredientes</h4>
+            <input
+              type="text"
+              placeholder="Buscar ingredientes..."
+              onChange={(e) => setSearchIngredient(e.target.value)}
+            />
+            {ingredientesFiltrados.map((ingrediente) => (
               <label key={ingrediente} className="filter-label">
                 {ingrediente}
                 <input
                   type="checkbox"
                   value={ingrediente}
-                  checked={filters.ingredientePrincipal.includes(ingrediente)}
-                  onChange={() => handleFilterChange('ingredientePrincipal', ingrediente)}
+                  checked={filters.ingredientes.includes(ingrediente)}
+                  onChange={() => handleFilterChange('ingredientes', ingrediente)}
                 />
               </label>
             ))}
@@ -162,22 +189,21 @@ const Dashboard = () => {
         </div>
 
         <div className="content">
-  {filteredRecetas.length > 0 ? (
-    <div className="recipes-list">
-      {filteredRecetas.map((receta) => (
-        <RecipeCard key={receta._id} receta={receta} />
-      ))}
-    </div>
-  ) : (
-    <p>No hay recetas que coincidan con los filtros seleccionados.</p>
-  )}
-</div>
+          {filteredRecetas.length > 0 ? (
+            <div className="recipes-list">
+              {filteredRecetas.map((receta) => (
+                <RecipeCard key={receta._id} receta={receta} />
+              ))}
+            </div>
+          ) : (
+            <p>No hay recetas que coincidan con los filtros seleccionados.</p>
+          )}
+        </div>
       </div>
 
       {showLogin && <Login setShowLogin={setShowLogin} />}
       {showUserInfo && <UserInfo user={userData} onClose={() => setShowUserInfo(false)} />}
       {showRegister && <Register setShowRegister={setShowRegister} />}
-        
     </div>
   );
 };
