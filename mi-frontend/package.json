@@ -29,4 +29,7 @@
     "vite": "^6.0.5"
   },
   "proxy": "http://localhost:3000"
+    
+    
+  
 }

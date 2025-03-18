@@ -1,7 +1,9 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { Navigate } from 'react-router-dom';
 
 const AuthContext = createContext();
+
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -14,7 +16,7 @@ export function AuthProvider({ children }) {
         const response = await fetch('http://localhost:3000/api/verify-auth', {
           credentials: 'include', // Incluir cookies en la solicitud
         });
-  
+
         if (response.ok) {
           const data = await response.json();
           setIsAuthenticated(true);
@@ -23,7 +25,6 @@ export function AuthProvider({ children }) {
           // Si el servidor responde con 401, el usuario no está autenticado
           setIsAuthenticated(false);
           setUser(null);
-          // No mostramos el error en la consola
         } else {
           // Otros errores
           console.error('Error al verificar autenticación:', response.statusText);
@@ -37,7 +38,7 @@ export function AuthProvider({ children }) {
         setUser(null);
       }
     };
-  
+
     verifyAuth();
   }, []);
 
@@ -46,6 +47,7 @@ export function AuthProvider({ children }) {
     try {
       setIsAuthenticated(true);
       setUser({ username, role, id }); // Actualizar el estado del usuario
+      localStorage.setItem('token', token); // Almacenar el token en localStorage
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
       throw error; // Propagar el error para manejarlo en el componente de login
@@ -59,11 +61,13 @@ export function AuthProvider({ children }) {
         method: 'POST',
         credentials: 'include', // Incluir cookies en la solicitud
       });
-
+  
       if (response.ok) {
         setIsAuthenticated(false);
         setUser(null);
-      } else {
+        localStorage.removeItem('token'); // Eliminar el token del localStorage
+        Navigate('/login'); 
+    } else {
         console.error('Error al cerrar sesión: Respuesta no exitosa');
       }
     } catch (error) {
@@ -80,6 +84,7 @@ export function AuthProvider({ children }) {
 
 AuthProvider.propTypes = {
   children: PropTypes.node.isRequired,
+  
 };
 
 export const useAuth = () => useContext(AuthContext);

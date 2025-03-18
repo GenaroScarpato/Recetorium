@@ -11,12 +11,14 @@ const RecipeCard = ({ receta }) => {
 
   return (
     <div className={styles['recipe-card']} onClick={handleClick}>
-      <img src={receta.foto} alt={receta.nombre} className={styles['recipe-image']} />
-      <div className={styles['recipe-details']}>
-        <h3 className={styles['recipe-name']}>{receta.nombre}</h3>
-        <div className={styles['recipe-meta']}>
-          <span className={styles['recipe-time']}>⏱️ {receta.tiempoPreparacion}</span>
-          <span className={styles['recipe-difficulty']}>⚙️ {receta.nivelDificultad}</span>
+      <div className={styles['recipe-container']}>
+        <img src={receta.foto} alt={receta.nombre} className={styles['recipe-image']} />
+        <div className={styles['recipe-details']}>
+          <h3 className={styles['recipe-name']}>{receta.nombre}</h3>
+          <div className={styles['recipe-meta']}>
+            <span className={styles['recipe-time']}>⏱️ {receta.tiempoPreparacion}</span>
+            <span className={styles['recipe-difficulty']}>⚙️ {receta.nivelDificultad}</span>
+          </div>
         </div>
       </div>
     </div>
