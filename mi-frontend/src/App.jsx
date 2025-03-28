@@ -11,7 +11,6 @@ function App() {
       <Routes>
         {/* Nueva ruta principal para la página de inicio con contenido de relleno */}
         <Route path="/" element={<Home />} />
-
         {/* Ruta para el Dashboard (ahora accesible desde otra URL) */}
         <Route path="/dashboard" element={<Dashboard />} />
 
