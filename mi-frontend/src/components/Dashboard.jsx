@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Login from './Login';
 import UserInfo from './UserInfo';
-import './Dashboard.css';
+import '../styles/Dashboard.css';
 import axios from 'axios';
 import Register from './Register';
 import Filters from './Filters'; // Importar el componente Filters

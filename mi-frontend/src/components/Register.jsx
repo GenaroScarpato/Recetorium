@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PropTypes from 'prop-types';
-import styles from './login.module.css'; // Importar CSS Modules
+import styles from '../styles/login.module.css'; // Importar CSS Modules
 
 function Register({ setShowRegister }) {
   const navigate = useNavigate();

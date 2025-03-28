@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import styles from './RecipeDetails.module.css';
+import styles from '../styles/RecipeDetails.module.css';
 
 const RecipeDetails = () => {
   const { id } = useParams();

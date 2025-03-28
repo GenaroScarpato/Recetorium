@@ -2,14 +2,18 @@ import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Dashboard from './components/Dashboard';
 import RecipeDetails from './components/RecipeDetails';
-import Login from './components/Login'; // Importa el componente Login
+import Login from './components/Login';
+import Home from './components/Home'; // Importa un nuevo componente Home para la página de inicio
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
-        {/* Ruta principal para el Dashboard */}
-        <Route path="/" element={<Dashboard />} />
+        {/* Nueva ruta principal para la página de inicio con contenido de relleno */}
+        <Route path="/" element={<Home />} />
+
+        {/* Ruta para el Dashboard (ahora accesible desde otra URL) */}
+        <Route path="/dashboard" element={<Dashboard />} />
 
         {/* Ruta para los detalles de la receta */}
         <Route path="/receta/:id" element={<RecipeDetails />} />

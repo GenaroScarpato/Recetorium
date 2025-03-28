@@ -1,4 +1,4 @@
-import './UserInfo.css';
+import '../styles/UserInfo.css';
 import PropTypes from 'prop-types';
 
 const UserInfo = ({ user, onClose }) => {

@@ -13,7 +13,7 @@
   position: fixed; /* Fijar la barra lateral */
   top: 60px; /* Ajustar la posición debajo del header */
   bottom: 0; /* Extender hasta el final de la pantalla */
-  overflow-y: auto; /* Permitir desplazamiento si hay muchos filtros */
+  /* overflow-y: auto; Eliminado para evitar la barra de desplazamiento interna */
 }
 
 /* Estilos para el contenido de las recetas */
@@ -21,7 +21,7 @@
   flex-grow: 1;
   margin-left: 250px; /* Ajustar el margen izquierdo para no superponerse con los filtros */
   padding: 20px;
-  overflow-y: auto; /* Permitir desplazamiento solo en el contenido de las recetas */
+  /* overflow-y: auto; Eliminado para evitar la barra de desplazamiento interna */
   color: #333;
   height: calc(100vh - 60px); /* Ajustar la altura para que no haya doble barra de desplazamiento */
 }
@@ -132,4 +132,22 @@
 
 .selected-filter span {
   font-size: 12px;
+}
+/* Estilos para la barra de búsqueda */
+.search-bar {
+  margin-bottom: 20px; /* Espacio entre la barra de búsqueda y las recetas */
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.search-bar input:focus {
+  border-color: #3498db; /* Cambiar el color del borde al enfocar */
 }

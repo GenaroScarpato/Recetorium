@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import './Filters.css'; // Importar los estilos de los filtros
+import '../styles/Filters.css'; // Importar los estilos de los filtros
 
 const Filters = ({ filters, handleFilterChange, setSearchIngredient, ingredientesFiltrados, activeFilter, toggleFilter }) => {
   // Función para manejar la eliminación de un filtro seleccionado

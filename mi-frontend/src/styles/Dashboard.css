@@ -8,7 +8,8 @@
 body {
   font-family: 'Arial', sans-serif;
   background-color: #f4f4f4;
-  min-height: 100vh;
+  min-height: 100vh; /* Asegura que el body ocupe al menos toda la altura de la ventana */
+  overflow-y: auto; /* Barra de desplazamiento única para la página */
 }
 
 /* Contenedor principal */
@@ -109,7 +110,8 @@ body {
 .main-content {
   display: flex;
   margin-top: 60px; /* Para evitar que el contenido se superponga con el header */
-  height: calc(100vh - 60px);
+  min-height: calc(100vh - 60px); /* Altura mínima para que ocupe el espacio restante */
+  overflow: hidden; /* Evitar que el contenido interno genere barras de desplazamiento */
 }
 
 /* Estilos para la barra lateral de filtros */
@@ -128,8 +130,9 @@ body {
   flex-grow: 1;
   margin-left: 250px; /* Ajustar el margen izquierdo para no superponerse con los filtros */
   padding: 20px;
-  overflow-y: auto; /* Permitir desplazamiento solo en el contenido de las recetas */
   color: #333;
+  overflow-y: auto; /* Permitir desplazamiento vertical */
+  min-height: calc(100vh - 60px); /* Ajustar la altura mínima */
 }
 
 /* Estilos para la lista de recetas */
@@ -166,9 +169,11 @@ body {
     width: 100%;
     height: auto;
     top: 0;
+    overflow-y: hidden; /* Oculta la barra de desplazamiento en móviles */
   }
 
   .recipes-content {
     margin-left: 0; /* En móviles, el contenido no tiene margen */
+    overflow-y: auto; /* Permitir desplazamiento vertical */
   }
 }

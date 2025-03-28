@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import styles from './RecipeCard.module.css'; // Importar CSS Modules
+import styles from '../styles/RecipeCard.module.css'; // Importar CSS Modules
 
 const RecipeCard = ({ receta }) => {
   const navigate = useNavigate();
