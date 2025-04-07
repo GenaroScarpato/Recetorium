@@ -1,76 +1,124 @@
 import { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import PropTypes from 'prop-types';
-import styles from '../styles/login.module.css'; // Importar CSS Modules
+import styles from '../styles/Login.module.css';
+import axios from 'axios';
 
-function Login({ setShowLogin }) {
+function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const username = e.target.username.value;
-    const password = e.target.password.value;
-
+    setIsLoading(true);
+    setError('');
+  
     try {
       const response = await axios.post('http://localhost:3000/api/login', {
-        username,
-        password,
+        username: formData.username,
+        password: formData.password
       }, {
-        withCredentials: true, // Incluir cookies en la solicitud
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
-
-      if (response.status === 200 && response.data.token && response.data.usuario) {
-        const { token, usuario, role, id } = response.data;
-
-        // Actualizar el estado de autenticación en el contexto
-        login(token, usuario, role, id);
-
-        // Cerrar el modal de login
-        setShowLogin(false);
-
-        // Redirigir al usuario a la página principal
-        navigate('/'); // Cambia '/' por la ruta que desees
+  
+      console.log('Respuesta completa:', response.data); // Para debug
+  
+      if (response.data.token) {  // Cambiamos la condición de éxito
+        await login(response.data.token, {
+          username: response.data.usuario,  // Asegúrate que coincide con "usuario"
+          role: response.data.role,
+          id: response.data.id,
+          foto: response.data.foto
+        });
+        navigate('/');
       } else {
-        setError('Credenciales inválidas');
+        throw new Error(response.data.message || 'Error en el inicio de sesión');
       }
     } catch (err) {
-      console.error('Error al iniciar sesión:', err.message);
-      setError('Credenciales inválidas');
+      console.error('Error completo:', err.response?.data || err.message);
+      setError(err.response?.data?.message || 
+               err.message || 
+               'Error al conectar con el servidor');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.wrapper}>
-        <button onClick={() => setShowLogin(false)} className={styles.closeButton}>×</button>
-        <h2 className={styles.title}>Iniciar Sesión</h2>
-
-        <form onSubmit={handleLogin} className={styles.form}>
-          <div className={styles.formGroup}>
-            <label htmlFor="username">Usuario:</label>
-            <input type="text" id="username" name="username" className={styles.input} required />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="password">Contraseña:</label>
-            <input type="password" id="password" name="password" className={styles.input} required />
-          </div>
-
-          {error && <div className={styles.errorMessage}><p>{error}</p></div>}
-
-          <button type="submit" className={styles.button}>Iniciar Sesión</button>
-        </form>
+    <div className={styles.loginPage}>
+      <div className={styles.loginIllustration}>
+        <div className={styles.illustrationContent}>
+          <h2>Bienvenido a Recetorium</h2>
+          <p>Descubre el chef que llevas dentro con nuestras recetas paso a paso</p>
+        </div>
+      </div>
+      
+      <div className={styles.loginFormContainer}>
+        <div className={styles.loginFormWrapper}>
+          <h1>Iniciar Sesión</h1>
+          
+          {error && <div className={styles.errorMessage}>{error}</div>}
+          
+          <form onSubmit={handleSubmit} className={styles.loginForm}>
+            <div className={styles.formGroup}>
+              <label htmlFor="username">Nombre de Usuario</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={(e) => setFormData({...formData, username: e.target.value})}
+                placeholder="Tu nombre de usuario"
+                required
+                autoComplete="username"
+              />
+            </div>
+            
+            <div className={styles.formGroup}>
+              <label htmlFor="password">Contraseña</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                placeholder="••••••••"
+                required
+                autoComplete="current-password"
+              />
+            </div>
+            
+            <button 
+              type="submit" 
+              disabled={isLoading} 
+              className={styles.submitButton}
+              aria-busy={isLoading}
+            >
+              {isLoading ? (
+                <span className={styles.spinner} aria-hidden="true"></span>
+              ) : (
+                'Ingresar'
+              )}
+            </button>
+            
+            <div className={styles.linksContainer}>
+              <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
+              <span>¿No tienes cuenta? <Link to="/register">Regístrate</Link></span>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
 }
-
-Login.propTypes = {
-  setShowLogin: PropTypes.func.isRequired,
-};
 
 export default Login;

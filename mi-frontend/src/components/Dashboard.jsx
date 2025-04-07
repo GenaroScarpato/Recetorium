@@ -1,229 +1,188 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import Login from './Login';
-import UserInfo from './UserInfo';
-import '../styles/Dashboard.css';
 import axios from 'axios';
-import Register from './Register';
-import Filters from './Filters'; // Importar el componente Filters
-import RecipeCard from './RecipeCard'; // Importar el componente RecipeCard
-import setupAxiosInterceptors from '../utils/axiosConfig'; // Importa el interceptor
+import Header from './Header';
+import RecipePost from './RecipePost';
+import '../styles/Dashboard.css';
 
 const Dashboard = () => {
-  const { isAuthenticated, user, logout } = useAuth();
-  const [recetas, setRecetas] = useState([]);
-  const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
-  const [showUserInfo, setShowUserInfo] = useState(false);
-  const [userData, setUserData] = useState(null);
-  const [filters, setFilters] = useState({
-    tipoComida: [],
-    nivelDificultad: [],
-    ingredientes: [],
-  });
-  const [searchIngredient, setSearchIngredient] = useState('');
-  const [ingredientesDisponibles, setIngredientesDisponibles] = useState([]);
-  const [activeFilter, setActiveFilter] = useState(null);
-  const [activeSection, setActiveSection] = useState('recetas');
-  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const { user } = useAuth();
+  const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  const recommendedChefs = [
+    { username: 'chef_martin', followers: '152 seguidores', specialty: 'Cocina italiana' },
+    { username: 'cocina_con_ana', followers: '98 seguidores', specialty: 'Postres saludables' },
+    { username: 'el_rincon_del_chef', followers: '245 seguidores', specialty: 'Carnes y parrillas' },
+    { username: 'recetas_veganas', followers: '320 seguidores', specialty: 'Comida vegana' },
+    { username: 'sabores_del_mundo', followers: '187 seguidores', specialty: 'Cocina internacional' }
+  ];
 
-  // Configura el interceptor de axios
   useEffect(() => {
-    setupAxiosInterceptors(logout); // Pasa la función logout al interceptor
-  }, [logout]);
+    const fetchRecipes = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('/api/recetas');
+        setRecipes(response.data);
+      } catch (error) {
+        console.error("Error cargando recetas:", error);
+        setError("No se pudieron cargar las recetas. Por favor intenta nuevamente.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Obtener los ingredientes desde la API
-  useEffect(() => {
-    fetch('http://localhost:3000/api/ingredientes')
-      .then((response) => response.json())
-      .then((data) => {
-        const nombresIngredientes = data.map((ingrediente) => ingrediente.nombre);
-        setIngredientesDisponibles(nombresIngredientes);
-      })
-      .catch((error) => console.error('Error al obtener los ingredientes:', error));
+    fetchRecipes();
   }, []);
 
-  // Filtrar ingredientes según la búsqueda
-  const ingredientesFiltrados = ingredientesDisponibles.filter((ingrediente) =>
-    ingrediente.toLowerCase().includes(searchIngredient.toLowerCase())
+  const filteredRecipes = recipes.filter(recipe => {
+    if (!recipe || !recipe.nombre) return false;
+    return recipe.nombre.toLowerCase().includes(searchQuery.toLowerCase()) || 
+           recipe.descripcion?.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
+  const sortedRecipes = [...filteredRecipes].sort((a, b) => 
+    new Date(b.createdAt) - new Date(a.createdAt)
   );
 
-  // Obtener las recetas desde la API
-  useEffect(() => {
-    fetch('http://localhost:3000/api/recetas', {
-      credentials: 'include',
-    })
-      .then((response) => response.json())
-      .then((data) => setRecetas(data))
-      .catch((error) => console.error('Error al obtener las recetas:', error));
-  }, []);
-
-  // Función para manejar el cierre de sesión
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
-  // Función para manejar cambios en los filtros
-  const handleFilterChange = (filterType, value) => {
-    setFilters((prevFilters) => {
-      const updatedFilters = { ...prevFilters };
-      if (updatedFilters[filterType].includes(value)) {
-        updatedFilters[filterType] = updatedFilters[filterType].filter((item) => item !== value);
-      } else {
-        updatedFilters[filterType] = [...updatedFilters[filterType], value];
-      }
-      return updatedFilters;
-    });
-  };
-
-  // Función para mostrar la información del usuario
-  const handleUserInfoClick = async () => {
-    try {
-      const response = await axios.get(`http://localhost:3000/api/usuarios/${user.id}`, {
-        withCredentials: true, // Incluir cookies
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`, // Incluir el token en el encabezado
-        },
-      });
-      setUserData(response.data);
-      setShowUserInfo(true);
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        console.error('No autorizado: Token inválido o expirado');
-        alert('No autorizado: Por favor, inicia sesión nuevamente.');
-      } else {
-        console.error('Error al obtener los datos del usuario:', error);
-      }
-    }
-  };
-
-  // Función de filtrado corregida
-  const filteredRecetas = recetas.filter((receta) => {
-    const contieneTodosLosIngredientes = filters.ingredientes.every((ingredienteSeleccionado) => {
-      return receta.ingredientes.some((ingredienteReceta) => 
-        ingredienteReceta.ingrediente.nombre === ingredienteSeleccionado
-      );
-    });
-
+  if (loading) {
     return (
-      (filters.tipoComida.length === 0 || filters.tipoComida.includes(receta.tipoComida)) &&
-      (filters.nivelDificultad.length === 0 || filters.nivelDificultad.includes(receta.nivelDificultad)) &&
-      (filters.ingredientes.length === 0 || contieneTodosLosIngredientes)
+      <div className="recipe-app-layout">
+        <Header 
+          searchQuery={searchQuery} 
+          onSearchChange={(e) => setSearchQuery(e.target.value)}
+          user={user}
+        />
+        <div className="loading">
+          <div className="loading-spinner"></div>
+          <p>Cargando las mejores recetas para ti...</p>
+        </div>
+      </div>
     );
-  });
+  }
 
-  // Función para alternar el filtro activo
-  const toggleFilter = (filterType) => {
-    setActiveFilter(activeFilter === filterType ? null : filterType);
-  };
-
-  // Función para renderizar el contenido según la sección activa
-  const renderContent = () => {
-    switch (activeSection) {
-      case 'perfil':
-        return (
-          <div className="content">
-            <h2>Perfil</h2>
-            <p>Aquí puedes ver y editar tu información de perfil.</p>
-            {/* Aquí puedes agregar más contenido relacionado con el perfil */}
-          </div>
-        );
-      case 'recetas':
-        return (
-          <div className="recipes-section-container">
-            <div className="filters-sidebar">
-              <Filters
-                filters={filters}
-                handleFilterChange={handleFilterChange}
-                searchIngredient={searchIngredient}
-                setSearchIngredient={setSearchIngredient}
-                ingredientesFiltrados={ingredientesFiltrados}
-                activeFilter={activeFilter}
-                toggleFilter={toggleFilter}
-              />
-            </div>
-            <div className="recipes-content">
-              <h2>Recetas</h2>
-              {filteredRecetas.length > 0 ? (
-                <div className="recipes-list">
-                  {filteredRecetas.map((receta) => (
-                    <RecipeCard key={receta._id} receta={receta} />
-                  ))}
-                </div>
-              ) : (
-                <p>No hay recetas que coincidan con los filtros seleccionados.</p>
-              )}
-            </div>
-          </div>
-        );
-      case 'coleccion':
-        return (
-          <div className="content">
-            <h2>Mi Colección</h2>
-            <p>Aquí puedes ver las recetas que has guardado en tu colección.</p>
-            {/* Aquí puedes agregar más contenido relacionado con la colección */}
-          </div>
-        );
-      default:
-        return <div className="content">Selecciona una sección</div>;
-    }
-  };
+  if (error) {
+    return (
+      <div className="recipe-app-layout">
+        <Header 
+          searchQuery={searchQuery} 
+          onSearchChange={(e) => setSearchQuery(e.target.value)}
+          user={user}
+        />
+        <div className="error">
+          <h2>¡Ups! Ocurrió un error</h2>
+          <p>{error}</p>
+          <button onClick={() => window.location.reload()} className="retry-button">
+            Intentar nuevamente
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="dashboard-container">
-      <div className="header">
-        <img src="../public/icono.png" alt="Icono" className="header-icon" />
-        <div className="navigation-menu">
-          <ul className="sidebar-menu">
-            <li>
-              <a href="#perfil" onClick={() => setActiveSection('perfil')}>
-                Perfil
-              </a>
-            </li>
-            <li>
-              <a href="#recetas" onClick={() => setActiveSection('recetas')}>
-                Recetas
-              </a>
-            </li>
-            <li>
-              <a href="#coleccion" onClick={() => setActiveSection('coleccion')}>
-                Mi Colección
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div className="auth-buttons">
-          {isAuthenticated && user ? (
-            <div className="user-info">
-              <button className="user-name" onClick={handleUserInfoClick}>
-                Bienvenido, {user.username}
-              </button>
-              <button onClick={handleLogout} className="logout-btn">
-                Cerrar sesión
-              </button>
-            </div>
-          ) : (
-            <>
-              <button className="login-btn" onClick={() => setShowLogin(true)}>
-                Login
-              </button>
-              <button className="register-btn" onClick={() => setShowRegister(true)}>
-                Register
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-
+    <div className="recipe-app-layout">
+      <Header 
+        searchQuery={searchQuery} 
+        onSearchChange={(e) => setSearchQuery(e.target.value)}
+        user={user}
+      />
+      
       <div className="main-content">
-        {renderContent()}
+        {/* Columna izquierda - Menú */}
+        <div className="left-column">
+          <h2>RECETORIUM</h2>
+          <nav className="navigation-menu">
+            <ul>
+              <li className="active">
+                <span className="icon">🏠</span>
+                <span>Inicio</span>
+              </li>
+              <li>
+                <span className="icon">📖</span>
+                <span>Mis recetas</span>
+              </li>
+              <li>
+                <span className="icon">📚</span>
+                <span>Guardadas</span>
+              </li>
+              <li>
+                <span className="icon">👥</span>
+                <span>Chefs</span>
+              </li>
+              <li>
+                <span className="icon">👤</span>
+                <span>Perfil</span>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        
+        {/* Columna central - Recetas */}
+        <div className="center-column">
+          <div className="recipes-feed">
+            {sortedRecipes.length > 0 ? (
+              sortedRecipes.map(recipe => (
+                <RecipePost 
+                  key={recipe._id}
+                  recipe={recipe}
+                  user={user}
+                />
+              ))
+            ) : (
+              <div className="no-results">
+                <div className="no-results-icon">🍽️</div>
+                <h3 className="no-results-title">No se encontraron recetas</h3>
+                <p>Intenta con otros términos de búsqueda</p>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Columna derecha - Chefs */}
+        <div className="right-column">
+          <div className="user-profile">
+            
+          
+          </div>
+          
+          <div className="suggestions-header">
+            <span>Chefs destacados</span>
+            <button>Ver todos</button>
+          </div>
+          
+          <div className="recommended-chefs">
+            {recommendedChefs.map((chef, index) => (
+              <div className="chef-card" key={index}>
+                <div className="chef-avatar">
+                  <img src={`https://i.pravatar.cc/150?img=${index + 10}`} alt={chef.username} />
+                </div>
+                <div className="chef-info">
+                  <span className="chef-username">{chef.username}</span>
+                  <span className="chef-followers">{chef.followers} • {chef.specialty}</span>
+                </div>
+                <button className="follow-button">Seguir</button>
+              </div>
+            ))}
+          </div>
+          
+          <div className="footer-links">
+            <div className="links-row">
+              <a href="#">Información</a>
+              <a href="#">Ayuda</a>
+              <a href="#">Prensa</a>
+            </div>
+            <div className="links-row">
+              <a href="#">Privacidad</a>
+              <a href="#">Condiciones</a>
+              <a href="#">Empleo</a>
+            </div>
+            <div className="copyright">© 2023 Recetorium</div>
+          </div>
+        </div>
       </div>
-
-      {showLogin && <Login setShowLogin={setShowLogin} />}
-      {showUserInfo && <UserInfo user={userData} onClose={() => setShowUserInfo(false)} />}
-      {showRegister && <Register setShowRegister={setShowRegister} />}
     </div>
   );
 };

@@ -45,7 +45,8 @@ const login = async (req, res) => {
             usuario: usuario.username,
             id: usuario._id,
             role: usuario.role,
-            token
+            token,
+            foto: usuario.foto
         });
 
     } catch (error) {
@@ -83,6 +84,7 @@ const verifyAuth = async (req, res) => {
                 id: usuario._id,
                 username: usuario.username,
                 role: usuario.role,
+                foto:  usuario.foto
             },
         });
     } catch (error) {

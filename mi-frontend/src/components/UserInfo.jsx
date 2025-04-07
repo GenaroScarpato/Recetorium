@@ -2,7 +2,6 @@ import '../styles/UserInfo.css';
 import PropTypes from 'prop-types';
 
 const UserInfo = ({ user, onClose }) => {
-  console.log("User data:", user);
 
   const getProfilePhoto = (foto) => {
     // Si la foto es 'url_default_foto_perfil', usar la imagen de Cloudinary

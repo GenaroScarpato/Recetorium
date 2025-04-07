@@ -2,9 +2,13 @@ const mongoose = require('mongoose');
 const { Ingrediente } = require('../models/ingredienteModel');
 const { consultarPrecio } = require('../services/preciosService');
 
+const pasoRecetaSchema = new mongoose.Schema({
+    orden: { type: Number, required: true },
+    descripcion: { type: String, required: true },
+},{_id: false});
 
-// Esquema de receta
 const recetaSchema = new mongoose.Schema({
+    chef: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true },
     nombre: { type: String, required: true },
     tipoComida: { 
         type: String, 
@@ -48,6 +52,20 @@ const recetaSchema = new mongoose.Schema({
         enum: ['Verano', 'Invierno', 'Primavera', 'Otoño', 'Todo el año'], 
         required: false 
     },
+    pasos: [pasoRecetaSchema],
+    comentarios: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comentario'
+    }],
+    comentarios: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comentario'
+    }],
+    likes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Usuario'
+    }],
+    likeCount: { type: Number, default: 0 },
     foto: { type: String, required: true }
 }, { versionKey: false });
 

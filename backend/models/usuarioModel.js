@@ -11,7 +11,7 @@ const usuarioSchema = new mongoose.Schema({
     role: {
         type: String,
         required: true,
-        enum: ['CLIENTE', 'ADMIN'], // Define los roles permitidos
+        enum: ['CLIENTE', 'ADMIN','CHEF'], // Define los roles permitidos
     },
 }, { versionKey: false });
 

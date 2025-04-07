@@ -1,22 +1,20 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import PropTypes from 'prop-types';
-import styles from '../styles/login.module.css'; // Importar CSS Modules
+import styles from '../styles/login.module.css';
 
-function Register({ setShowRegister }) {
+function Register() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Función para validar el nombre de usuario
   const validateUsername = (username) => {
     const errors = [];
     const minLength = 3;
     const maxLength = 20;
-    const validChars = /^[a-zA-Z0-9_]+$/; // Solo letras, números y guiones bajos
+    const validChars = /^[a-zA-Z0-9_]+$/;
 
     if (username.length < minLength || username.length > maxLength) {
       errors.push('El nombre de usuario debe tener entre 3 y 20 caracteres.');
@@ -28,7 +26,6 @@ function Register({ setShowRegister }) {
     return errors;
   };
 
-  // Función para validar la contraseña
   const validatePassword = (password) => {
     const errors = [];
     const minLength = 8;
@@ -62,18 +59,14 @@ function Register({ setShowRegister }) {
     const password = e.target.password.value;
     const confirmPassword = e.target.confirmPassword.value;
 
-    // Validar nombre de usuario
     const usernameErrors = validateUsername(username);
-    // Validar contraseña
     const passwordErrors = validatePassword(password);
-    // Validar confirmación de contraseña
     const confirmPasswordErrors = password !== confirmPassword ? ['Las contraseñas no coinciden.'] : [];
 
-    // Combinar todos los errores
     const allErrors = [...usernameErrors, ...passwordErrors, ...confirmPasswordErrors];
 
     if (allErrors.length > 0) {
-      setError(allErrors.join('\n')); // Unir todos los errores con saltos de línea
+      setError(allErrors.join('\n'));
       return;
     }
 
@@ -81,10 +74,9 @@ function Register({ setShowRegister }) {
       const registerResponse = await axios.post('http://localhost:3000/api/usuarios', {
         username,
         password,
-      } , {
-        withCredentials: true, // Incluir cookies en la solicitud
-      }
-    );
+      }, {
+        withCredentials: true,
+      });
 
       if (registerResponse.status === 201) {
         setSuccess('Usuario registrado exitosamente. Iniciando sesión...');
@@ -95,26 +87,24 @@ function Register({ setShowRegister }) {
             username,
             password,
           }, {
-            withCredentials: true, // Incluir cookies en la solicitud
+            withCredentials: true,
           });
-
+        
           if (loginResponse.status === 200 && loginResponse.data.token && loginResponse.data.usuario) {
             const { token, usuario, role, id } = loginResponse.data;
-            login(token, usuario, role, id);
-            setShowRegister(false);
+            login(token, { username: usuario, role, id });
             navigate('/');
           } else {
-            setError('Error al iniciar sesión automáticamente');
+            setError('Error al iniciar sesión automáticamente: ' + 
+                    (loginResponse.data.message || 'Error desconocido'));
           }
         } catch (loginError) {
-          console.error('Error al iniciar sesión automáticamente:', loginError.message);
-          setError('Error al iniciar sesión automáticamente');
+          setError('Registro exitoso, pero falló el inicio de sesión automático: ' + 
+                  (loginError.response?.data?.message || loginError.message));
+          navigate('/login');
         }
-      } else {
-        setError('Error al registrar el usuario');
       }
     } catch (err) {
-      console.error('Error al registrar el usuario:', err.message);
       setError(err.response?.data?.message || 'Error al registrar el usuario');
     }
   };
@@ -122,7 +112,6 @@ function Register({ setShowRegister }) {
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
-        <button onClick={() => setShowRegister(false)} className={styles.closeButton}>×</button>
         <h2 className={styles.title}>Registrarse</h2>
 
         <form onSubmit={handleRegister} className={styles.form}>
@@ -158,14 +147,14 @@ function Register({ setShowRegister }) {
           {success && <div className={styles.successMessage}>{success}</div>}
 
           <button type="submit" className={styles.button}>Registrarse</button>
+
+          <div className={styles.loginLink}>
+            ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
+          </div>
         </form>
       </div>
     </div>
   );
 }
-
-Register.propTypes = {
-  setShowRegister: PropTypes.func.isRequired,
-};
 
 export default Register;

@@ -1,87 +1,143 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import styles from '../styles/RecipeDetails.module.css';
+import { useEffect } from 'react';
+import PropTypes from 'prop-types';
+import '../styles/RecipeDetails.css';
 
-const RecipeDetails = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [receta, setReceta] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
+const RecipeDetails = ({ 
+  recipe = {}, 
+  comments = [],
+  onClose, 
+  onCommentSubmit,
+  commentText = '',
+  onCommentChange,
+  onLike,
+  isLiked = false
+}) => {
   useEffect(() => {
-    axios.get(`http://localhost:3000/api/recetas/${id}`)
-      .then((response) => {
-        setReceta(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error al obtener los detalles de la receta:', error);
-        setError(error);
-        setLoading(false);
-      });
-  }, [id]);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
 
-  if (loading) {
-    return <p className={styles.loading}>Cargando...</p>;
-  }
-
-  if (error) {
-    return <p className={styles.error}>Error al cargar la receta. Por favor, intenta nuevamente.</p>;
-  }
+  if (!recipe._id) return null;
 
   return (
-    <div className={styles.recipeDetails}>
-      <button onClick={() => navigate(-1)} className={styles.backButton}>
-        ❌
-      </button>
-      
-      <div className={styles.contentWrapper}>
-        {/* Sección izquierda (imagen y título) */}
-        <div className={styles.leftSection}>
-          <h1 className={styles.recipeTitle}>{receta.nombre}</h1>
-          <img 
-            src={receta.foto} 
-            alt={receta.nombre} 
-            className={styles.recipeImage} 
-          />
-        </div>
-
-        {/* Sección derecha (detalles) */}
-        <div className={styles.rightSection}>
-          <p className={styles.description}>{receta.descripcion}</p>
-
-          <div className={styles.recipeMeta}>
-            <span>⏱️ Tiempo: {receta.tiempoPreparacion}</span>
-            <span>⚙️ Dificultad: {receta.nivelDificultad}</span>
-            <span>🍽️ Ingrediente principal: {receta.ingredientePrincipal}</span>
-            <span>🍲 Tipo: {receta.tipoComida}</span>
-            <span>🌍 Cocina: {receta.tipoCocina}</span>
-            <span>🔥 Cocción: {receta.metodoCoccion}</span>
-            <span>🍂 Temporada: {receta.temporada || "Todo el año"}</span>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <button className="close-modal" onClick={onClose}>
+          &times;
+        </button>
+        
+        <div className="recipe-details">
+          <div className="recipe-header">
+            <div className="user-info">
+              <img 
+                src={recipe.usuario?.avatar || '/default-avatar.png'} 
+                alt={recipe.usuario?.username || 'Chef'} 
+                className="user-avatar"
+              />
+              <span className="username">{recipe.usuario?.username || 'Chef'}</span>
+            </div>
+            <button 
+              className={`like-button ${isLiked ? 'liked' : ''}`}
+              onClick={onLike}
+            >
+              {isLiked ? '❤️' : '🤍'} {recipe.likes || 0}
+            </button>
           </div>
 
-          <div className={styles.ingredientesSection}>
-            <h2>Ingredientes</h2>
-            <ul>
-              {receta.ingredientes && receta.ingredientes.length > 0 ? (
-                receta.ingredientes.map((ingrediente, index) => (
-                  <li key={index} className={styles.ingredienteItem}>
-                    <span className={styles.ingredienteNombre }>{ingrediente.ingrediente?.nombre || "Ingrediente desconocido"}</span>
-                    {": "}
-                    <span className={styles.ingredienteCantidad }>{ingrediente.cantidad} {ingrediente.unidad}</span>
-                  </li>
-                ))
-              ) : (
-                <li>No hay ingredientes disponibles.</li>
-              )}
-            </ul>
+          <div className="recipe-image-container">
+            <img 
+              src={recipe.foto || '/default-recipe.jpg'} 
+              alt={recipe.nombre} 
+              className="recipe-image"
+            />
+          </div>
+
+          <div className="recipe-content">
+            <h1 className="recipe-title">{recipe.nombre}</h1>
+            <p className="recipe-description">{recipe.descripcion}</p>
+            
+            <div className="recipe-meta">
+              <div className="meta-item">
+                <span>⏱️ Tiempo:</span>
+                <span>{recipe.tiempoPreparacion || 'No especificado'}</span>
+              </div>
+              <div className="meta-item">
+                <span>⚡ Dificultad:</span>
+                <span>{recipe.nivelDificultad || 'No especificada'}</span>
+              </div>
+            </div>
+
+            <div className="recipe-comments-section">
+              <h2>Comentarios</h2>
+              <div className="comments-list">
+                {comments.length > 0 ? (
+                  comments.map(comment => (
+                    <div key={comment._id} className="comment">
+                      <img 
+                        src={comment.usuarioId?.foto || '/default-avatar.png'} 
+                        alt={comment.usuarioId?.username || 'Usuario'}
+                        className="comment-avatar"
+                      />
+                      <div className="comment-content">
+                        <span className="comment-username">
+                          {comment.usuarioId?.username || 'Usuario'}
+                        </span>
+                        <p className="comment-text">{comment.texto}</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-comments">No hay comentarios aún</p>
+                )}
+              </div>
+
+              <form onSubmit={onCommentSubmit} className="comment-form">
+                <input
+                  type="text"
+                  value={commentText}
+                  onChange={onCommentChange}
+                  placeholder="Agrega un comentario..."
+                  className="comment-input"
+                />
+                <button 
+                  type="submit" 
+                  className="comment-submit"
+                  disabled={!commentText.trim()}
+                >
+                  Publicar
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
+};
+
+RecipeDetails.propTypes = {
+  recipe: PropTypes.shape({
+    _id: PropTypes.string,
+    nombre: PropTypes.string,
+    foto: PropTypes.string,
+    tiempoPreparacion: PropTypes.string,
+    nivelDificultad: PropTypes.string,
+    descripcion: PropTypes.string,
+    likes: PropTypes.number,
+    usuario: PropTypes.shape({
+      avatar: PropTypes.string,
+      username: PropTypes.string
+    })
+  }),
+  comments: PropTypes.array,
+  onClose: PropTypes.func.isRequired,
+  onCommentSubmit: PropTypes.func.isRequired,
+  commentText: PropTypes.string,
+  onCommentChange: PropTypes.func.isRequired,
+  onLike: PropTypes.func.isRequired,
+  isLiked: PropTypes.bool
 };
 
 export default RecipeDetails;

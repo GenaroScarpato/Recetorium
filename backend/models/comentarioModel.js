@@ -28,8 +28,11 @@ const getById = async (id) => {
 };
 
 const getByReceta = async (recetaId) => {
-    return await Comentario.find({ recetaId }).populate('usuarioId', 'username'); // Poblamos el username del usuario
+    return await Comentario.find({ recetaId })
+        .populate('usuarioId', 'username foto'); // Ahora también traemos la foto del usuario
 };
+
+
 
 const getByUser = async (usuarioId) => {
     return await Comentario.find({ usuarioId }).populate('recetaId', 'nombre'); // Poblamos el título de la receta

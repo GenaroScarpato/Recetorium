@@ -4,7 +4,7 @@ const fileUpload = require('express-fileupload'); // Para manejar la subida de a
 const cloudinary = require('../config/cloudinaryConfig'); // Importa la configuración de Cloudinary
 const { model } = require("mongoose");
 const recetasModel = require("../models/recetaModel");
-
+const comentarioModel = require("../models/comentarioModel");
 const getAll = async (req, res) => {    
     try {
         const recetas = await recetasModel.getAll();
@@ -225,11 +225,140 @@ const calcularCostoReceta = async (req, res) => {
     }
 };
 
+const agregarPaso = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { orden, descripcion, imagen } = req.body;
+        
+        const receta = await recetasModel.getById(id);
+        if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
+
+        receta.pasos.push({ orden, descripcion, imagen });
+        await receta.save();
+        
+        res.status(201).json(receta);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const obtenerRecetaConComentarios = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const receta = await recetasModel.getById(id)
+            .populate('comentarios')
+            .populate({
+                path: 'comentarios.usuarioId',
+                select: 'username'
+            });
+            
+        if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
+        
+        res.json(receta);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
 
+// Likes
+const likeReceta = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const usuarioId = req.user.id; // Asumiendo que validarJwt añade el usuario a req.user
 
+        const receta = await recetasModel.getById(id);
+        if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
 
+        // Verificar si el usuario ya dio like
+        if (receta.likes.includes(usuarioId)) {
+            return res.status(400).json({ error: 'Ya has dado like a esta receta' });
+        }
 
+        receta.likes.push(usuarioId);
+        receta.likeCount = receta.likes.length;
+        await receta.save();
+
+        res.status(200).json({ message: 'Like agregado', likeCount: receta.likeCount });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const unlikeReceta = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const usuarioId = req.user.id;
+
+        const receta = await recetasModel.getById(id);
+        if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
+
+        // Verificar si el usuario dio like
+        const index = receta.likes.indexOf(usuarioId);
+        if (index === -1) {
+            return res.status(400).json({ error: 'No has dado like a esta receta' });
+        }
+
+        receta.likes.splice(index, 1);
+        receta.likeCount = receta.likes.length;
+        await receta.save();
+
+        res.status(200).json({ message: 'Like removido', likeCount: receta.likeCount });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const getLikesReceta = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const receta = await recetasModel.getById(id).populate('likes', 'username');
+        
+        if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
+        
+        res.json({
+            likeCount: receta.likeCount,
+            likes: receta.likes
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Comentarios
+const agregarComentario = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { texto , usuarioId } = req.body;
+        // Verificar que la receta existe
+        const receta = await recetasModel.getById(id);
+        if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
+
+        // Crear el comentario
+        const nuevoComentario = await comentarioModel.add(usuarioId, id, texto);
+
+        // Agregar el comentario a la receta
+        receta.comentarios.push(nuevoComentario._id);
+        await receta.save();
+
+        // Obtener el comentario con los datos del usuario
+        const comentarioPopulado = await comentarioModel.getById(nuevoComentario._id);
+
+        res.status(201).json(comentarioPopulado);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const getComentariosReceta = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const comentarios = await comentarioModel.getByReceta(id);
+        res.json(comentarios);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
 module.exports = {
     getAll,
@@ -239,6 +368,12 @@ module.exports = {
     add,
     buscarRecetasPorIngredientes,
     buscarPorTipoComida,
-    calcularCostoReceta
-
+    calcularCostoReceta,
+    agregarPaso,
+    obtenerRecetaConComentarios,
+    likeReceta,
+    unlikeReceta,
+    getLikesReceta,
+    agregarComentario,
+    getComentariosReceta
 };

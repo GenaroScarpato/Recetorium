@@ -2,21 +2,23 @@ const comentariosModel = require("../models/comentarioModel"); // Cambiado para 
 
 const add = async (req, res) => {
     try {
-        const { recetaId, texto } = req.body; // Obtiene la recetaId y el texto del cuerpo de la petición
-        const usuarioId = req.usuario.id; // Asumiendo que tienes el ID del usuario en el token
+        const { recetaId, texto } = req.body;
+        const usuarioId = req.usuario.id;
         
-        const nuevoComentario = await comentariosModel.add(usuarioId, recetaId, texto); // Usando add
-        res.status(201).json({
-            message: 'Comentario agregado exitosamente',
-            comentario: nuevoComentario // Retorna el nuevo comentario
-        });
+        // 1. Crea el comentario
+        const nuevoComentario = await comentariosModel.add(usuarioId, recetaId, texto);
+        
+        // 2. Actualiza la receta para incluir el comentario
+        await Receta.findByIdAndUpdate(
+            recetaId,
+            { $push: { comentarios: nuevoComentario._id } }
+        );
+        
+        res.status(201).json(nuevoComentario);
     } catch (error) {
-        res.status(500).json({
-            message: 'Hubo un error al agregar el comentario',
-            error: error.message
-        });
+        res.status(500).json({ error: error.message });
     }
-}
+};
 const getTodos = async (req, res) => {
     try {
         const comentarios = await comentariosModel.getTodos();
