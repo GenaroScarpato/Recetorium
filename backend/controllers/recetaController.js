@@ -42,63 +42,55 @@ const deleteById = async (req, res) => {
 
 const updateById = async (req, res) => {
     const { id } = req.params;
-
+  
     try {
-        let recetaActualizada = { ...req.body };
-
-        // Verifica si se subió una nueva imagen
-        if (req.files && req.files.foto) {
-            const file = req.files.foto;
-
-            // Verifica si el archivo tiene una ruta temporal
-            if (!file.tempFilePath) {
-                console.error("El archivo no tiene una ruta temporal:", file);
-                return res.status(400).json({ error: 'El archivo de imagen no es válido' });
-            }
-
-            // Sube la nueva imagen a Cloudinary
-            const result = await cloudinary.uploader.upload(file.tempFilePath, {
-                folder: 'recetas', // Opcional: Organiza las imágenes en una carpeta
-            });
-
-            // Elimina el archivo temporal después de subirlo a Cloudinary
-            fs.unlink(file.tempFilePath, (err) => {
-                if (err) {
-                    console.error("Error al eliminar el archivo temporal:", err);
-                } else {
-                    console.log("Archivo temporal eliminado:", file.tempFilePath);
-                }
-            });
-
-            // Actualiza el campo "foto" con la nueva URL
-            recetaActualizada.foto = result.secure_url;
+      let recetaActualizada = { ...req.body };
+  
+      console.log("📤 PATCH recibido:", recetaActualizada);
+  
+      // Subida de nueva imagen (opcional)
+      if (req.files && req.files.foto) {
+        const file = req.files.foto;
+  
+        if (!file.tempFilePath) {
+          console.error("❌ Archivo sin ruta temporal:", file);
+          return res.status(400).json({ error: 'Archivo de imagen no válido' });
         }
-
-        // Obtén la receta actual para preservar los campos no enviados
-        const recetaExistente = await recetasModel.getById(id);
-        if (!recetaExistente) {
-            return res.status(404).json({ error: `Receta con ID ${id} no encontrada` });
-        }
-
-        // Combina los campos existentes con los nuevos
-        const datosActualizados = { ...recetaExistente.toObject(), ...recetaActualizada };
-
-        // Actualiza la receta en la base de datos
-        const updatedReceta = await recetasModel.updateById(id, datosActualizados);
-
-        if (updatedReceta) {
-            res.status(200).json({
-                message: `Receta con ID ${id} actualizada correctamente`,
-                updatedReceta,
-            });
-        } else {
-            res.status(404).json({ error: `Receta con ID ${id} no encontrada` });
-        }
+  
+        const result = await cloudinary.uploader.upload(file.tempFilePath, {
+          folder: 'recetas',
+        });
+  
+        fs.unlink(file.tempFilePath, (err) => {
+          if (err) {
+            console.error("⚠️ Error al eliminar archivo temporal:", err);
+          } else {
+            console.log("🧹 Archivo temporal eliminado:", file.tempFilePath);
+          }
+        });
+  
+        recetaActualizada.foto = result.secure_url;
+      }
+  
+      // Actualiza solo con los campos nuevos (no mergeamos con la receta existente)
+      console.log("🛠️ Campos finales para actualizar:", recetaActualizada);
+  
+      const updatedReceta = await recetasModel.updateById(id, recetaActualizada);
+  
+      if (updatedReceta) {
+        res.status(200).json({
+          message: `Receta con ID ${id} actualizada correctamente`,
+          updatedReceta,
+        });
+      } else {
+        res.status(404).json({ error: `Receta con ID ${id} no encontrada` });
+      }
     } catch (error) {
-        console.error("Error en updateById:", error); // Agrega este log para ver el error
-        res.status(500).json({ error: 'Hubo un error al actualizar la receta', message: error.message });
+      console.error("💥 Error en PATCH updateById:", error);
+      res.status(500).json({ error: 'Error al actualizar la receta', message: error.message });
     }
-};
+  };
+
 const add = async (req, res) => {
     try {
         let fotoUrl = null;
@@ -260,55 +252,53 @@ const obtenerRecetaConComentarios = async (req, res) => {
     }
 };
 
-
-// Likes
 const likeReceta = async (req, res) => {
     try {
-        const { id } = req.params;
-        const usuarioId = req.user.id; // Asumiendo que validarJwt añade el usuario a req.user
+      const { id } = req.params;
+      const usuarioId = req.usuario._id.toString();
 
-        const receta = await recetasModel.getById(id);
-        if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
-
-        // Verificar si el usuario ya dio like
-        if (receta.likes.includes(usuarioId)) {
-            return res.status(400).json({ error: 'Ya has dado like a esta receta' });
-        }
-
-        receta.likes.push(usuarioId);
-        receta.likeCount = receta.likes.length;
-        await receta.save();
-
-        res.status(200).json({ message: 'Like agregado', likeCount: receta.likeCount });
+      const receta = await recetasModel.getById(id);
+      if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
+  
+      if (receta.likes.includes(usuarioId)) {
+        return res.status(400).json({ error: 'Ya has dado like a esta receta' });
+      }
+  
+      receta.likes.push(usuarioId);
+      receta.likeCount = receta.likes.length;
+      await receta.save();
+  
+      res.status(200).json({ message: 'Like agregado', likeCount: receta.likeCount });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      console.error("💥 Error en likeReceta:", error.message);
+      res.status(500).json({ error: error.message });
     }
-};
-
-const unlikeReceta = async (req, res) => {
+  };
+  
+  const unlikeReceta = async (req, res) => {
     try {
-        const { id } = req.params;
-        const usuarioId = req.user.id;
-
-        const receta = await recetasModel.getById(id);
-        if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
-
-        // Verificar si el usuario dio like
-        const index = receta.likes.indexOf(usuarioId);
-        if (index === -1) {
-            return res.status(400).json({ error: 'No has dado like a esta receta' });
-        }
-
-        receta.likes.splice(index, 1);
-        receta.likeCount = receta.likes.length;
-        await receta.save();
-
-        res.status(200).json({ message: 'Like removido', likeCount: receta.likeCount });
+      const { id } = req.params;
+      const usuarioId = req.usuario._id.toString();
+  
+      const receta = await recetasModel.getById(id);
+      if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
+  
+      const index = receta.likes.indexOf(usuarioId);
+      if (index === -1) {
+        return res.status(400).json({ error: 'No has dado like a esta receta' });
+      }
+  
+      receta.likes.splice(index, 1);
+      receta.likeCount = receta.likes.length;
+      await receta.save();
+  
+      res.status(200).json({ message: 'Like removido', likeCount: receta.likeCount });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      console.error("💥 Error en unlikeReceta:", error.message);
+      res.status(500).json({ error: error.message });
     }
-};
-
+  };
+  
 const getLikesReceta = async (req, res) => {
     try {
         const { id } = req.params;
@@ -325,23 +315,20 @@ const getLikesReceta = async (req, res) => {
     }
 };
 
-// Comentarios
 const agregarComentario = async (req, res) => {
     try {
         const { id } = req.params;
-        const { texto , usuarioId } = req.body;
-        // Verificar que la receta existe
+        const { texto } = req.body;
+        const usuarioId = req.usuario._id;
+
         const receta = await recetasModel.getById(id);
         if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
 
-        // Crear el comentario
         const nuevoComentario = await comentarioModel.add(usuarioId, id, texto);
 
-        // Agregar el comentario a la receta
         receta.comentarios.push(nuevoComentario._id);
         await receta.save();
 
-        // Obtener el comentario con los datos del usuario
         const comentarioPopulado = await comentarioModel.getById(nuevoComentario._id);
 
         res.status(201).json(comentarioPopulado);
@@ -350,15 +337,18 @@ const agregarComentario = async (req, res) => {
     }
 };
 
-const getComentariosReceta = async (req, res) => {
+  
+  const getComentariosReceta = async (req, res) => {
     try {
-        const { id } = req.params;
-        const comentarios = await comentarioModel.getByReceta(id);
-        res.json(comentarios);
+      const { id } = req.params;
+      const comentarios = await comentarioModel.getByReceta(id);
+      res.json(comentarios);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      console.error("💥 Error en getComentariosReceta:", error.message);
+      res.status(500).json({ error: error.message });
     }
-};
+  };
+  
 
 module.exports = {
     getAll,

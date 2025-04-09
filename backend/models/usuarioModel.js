@@ -29,8 +29,9 @@ const getByName = async (username) => {
     return await Usuario.findOne({ username });  // Cambiar el argumento a un objeto
 }
 const getById = async (id) => {
-    return await Usuario.findById(id);
-}
+    return await Usuario.findById(id).select('username foto role');
+  };
+  
 
 const add = async (newUser) => {
     const user = new Usuario(newUser);

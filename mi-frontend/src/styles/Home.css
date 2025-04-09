@@ -31,7 +31,7 @@
   
   /* ===== HERO SECTION ===== */
   .hero {
-    height: 100vh;
+    height: 120vh;
     background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), 
                 url('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80') center/cover no-repeat;
     display: flex;

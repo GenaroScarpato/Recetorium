@@ -24,6 +24,7 @@ const getUsuarioById = async (req, res) => {
             res.status(404).json({ error: 'usuario no encontrado' });
         }
     } catch (error) {
+        console.error('Error al obtener el usuario:', error);
         res.status(500).json({ error: 'Hubo un error al obtener el usuario' });
     }
 }

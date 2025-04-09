@@ -33,11 +33,15 @@ const ProfilePage = () => {
     return <div className="error">Error al cargar el perfil</div>;
   }
 
+  // ✅ Lógica para foto de perfil
+  const defaultImage = 'https://res.cloudinary.com/dkpwnkhza/image/upload/v1741732506/usuarios/vwmsergnpyzw8ktvq8yg.png';
+  const profileImage = userData.foto && userData.foto !== 'url_default_foto_perfil' ? userData.foto : defaultImage;
+
   return (
     <div className="profile-page-container">
       <div className="profile-header">
         <img 
-          src={userData.foto || 'https://res.cloudinary.com/dkpwnkhza/image/upload/v1741732506/usuarios/vwmsergnpyzw8ktvq8yg.png'} 
+          src={profileImage}
           alt="Foto de perfil"
           className="profile-avatar-large"
         />
@@ -51,6 +55,10 @@ const ProfilePage = () => {
           <div className="detail-row">
             <span className="detail-label">Nombre:</span>
             <span className="detail-value">{userData.nombre || 'No especificado'}</span>
+          </div>
+          <div className="detail-row">
+            <span className="detail-label">Rol:</span>
+            <span className="detail-value">{userData.role}</span>
           </div>
           <div className="detail-row">
             <span className="detail-label">Email:</span>

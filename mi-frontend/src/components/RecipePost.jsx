@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import '../styles/RecipePost.css';
 import RecipeDetails from './RecipeDetails';
 
@@ -13,7 +14,15 @@ const RecipePost = ({ recipe = {}, user = null }) => {
   const [likesCount, setLikesCount] = useState(recipe.likes?.length || 0);
   const [loadingComments, setLoadingComments] = useState(true);
   const [error, setError] = useState(null);
-  const { token } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const defaultImage = 'https://res.cloudinary.com/dkpwnkhza/image/upload/v1741732506/usuarios/vwmsergnpyzw8ktvq8yg.png';
+  const profileImage = recipe.chef?.foto && recipe.chef.foto !== 'url_default_foto_perfil'
+    ? recipe.chef.foto
+    : defaultImage;
+
+  const chefUsername = recipe.chef?.username || 'Chef';
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -30,7 +39,7 @@ const RecipePost = ({ recipe = {}, user = null }) => {
         setLoadingComments(false);
       }
     };
-    
+
     if (recipe._id) {
       fetchComments();
     }
@@ -42,11 +51,18 @@ const RecipePost = ({ recipe = {}, user = null }) => {
   };
 
   const handleLike = async () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
     try {
       const endpoint = isLiked ? 'unlike' : 'like';
-      await axios.post(`/api/recetas/${recipe._id}/${endpoint}`, {}, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      await axios.post(
+        `/api/recetas/${recipe._id}/${endpoint}`,
+        {},
+        { withCredentials: true }
+      );
       setIsLiked(!isLiked);
       setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
     } catch (error) {
@@ -57,16 +73,21 @@ const RecipePost = ({ recipe = {}, user = null }) => {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
     if (!commentText.trim()) return;
-    
+
     try {
       const response = await axios.post(
-        `/api/recetas/${recipe._id}/comentarios`, 
+        `/api/recetas/${recipe._id}/comentarios`,
         { texto: commentText },
-        { headers: { 'Authorization': `Bearer ${token}` } }
+        { withCredentials: true }
       );
-      
-      setComments(prev => [...prev, response.data]);
+
+      setComments(prev => [...prev, { ...response.data, isNew: true }]);
       setCommentText('');
       setError(null);
     } catch (error) {
@@ -77,40 +98,49 @@ const RecipePost = ({ recipe = {}, user = null }) => {
 
   if (!recipe._id) return null;
 
+  // Mostrar solo los primeros 2 comentarios
+  const visibleComments = comments.slice(0, 2);
+
   return (
     <div className="social-post">
       <div className="recipe-post-container" onClick={toggleDetails}>
         <div className="post-header">
-          <div className="user-info">
+          <a href={`/perfil/${recipe.chef?._id}`} className="username-container" onClick={(e) => e.stopPropagation()}>
             <img 
-              src={recipe.usuario?.avatar || '/default-avatar.png'} 
-              alt="User"
+              src={profileImage}
+              alt={`Foto de ${chefUsername}`}
               className="user-avatar"
             />
-            <span className="username">{recipe.usuario?.username || 'Chef'}</span>
-          </div>
+            <span className="username">
+              {chefUsername}
+              {recipe.chef?.role === 'CHEF' && (
+                <span className="verified-badge" title="Chef verificado">✔</span>
+              )}
+            </span>
+          </a>
         </div>
 
         <div className="post-image-container">
-          <img 
-            src={recipe.foto || '/default-recipe.jpg'} 
+          <img
+            src={recipe.foto || '/default-recipe.jpg'}
             alt={recipe.nombre}
             className="post-image"
           />
         </div>
 
-        <div className="post-actions">
-          <div className="action-buttons">
-            <button 
-              className={`like-button ${isLiked ? 'liked' : ''}`}
-              onClick={handleLike}
-            >
-              {isLiked ? '❤️' : '🤍'}
-            </button>
-            <button className="comment-button">💬</button>
-          </div>
-          <span className="likes-count">{likesCount} Me gusta</span>
+        <div className="recipe-title">{recipe.nombre}</div>
+
+        <div className="post-buttons-row">
+          <button
+            className={`like-button ${isLiked ? 'liked' : ''}`}
+            onClick={handleLike}
+          >
+            {isLiked ? '❤️' : '🤍'}
+          </button>
+          <button className="comment-button">💬</button>
         </div>
+
+        <span className="likes-count">{likesCount} Me gusta</span>
 
         <div className="post-content">
           <p className="post-caption">{recipe.descripcion}</p>
@@ -123,9 +153,9 @@ const RecipePost = ({ recipe = {}, user = null }) => {
           ) : (
             <>
               <div className="comments-list">
-                {comments.length > 0 ? (
-                  comments.map(comment => (
-                    <div key={comment._id} className="comment">
+                {visibleComments.length > 0 ? (
+                  visibleComments.map(comment => (
+                    <div key={comment._id} className={`comment ${comment.isNew ? 'new' : ''}`}>
                       <p>
                         <span className="comment-user">
                           {comment.usuarioId?.username || 'Usuario'}
@@ -138,6 +168,19 @@ const RecipePost = ({ recipe = {}, user = null }) => {
                   <p className="no-comments">No hay comentarios aún</p>
                 )}
               </div>
+
+              {comments.length > 2 && (
+                <button
+                  className="view-all-comments"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDetails(true); // Mostrar el modal completo
+                  }}
+                >
+                  Ver todos los comentarios
+                </button>
+              )}
+
               <form onSubmit={handleCommentSubmit} className="comment-form">
                 <input
                   type="text"
@@ -146,8 +189,8 @@ const RecipePost = ({ recipe = {}, user = null }) => {
                   placeholder="Agrega un comentario..."
                   className="comment-input"
                 />
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="comment-submit"
                   disabled={!commentText.trim()}
                 >
@@ -158,14 +201,14 @@ const RecipePost = ({ recipe = {}, user = null }) => {
           )}
         </div>
       </div>
-      
+
       {showDetails && (
-        <RecipeDetails 
-          recipe={{ 
+        <RecipeDetails
+          recipe={{
             ...recipe,
             likes: likesCount,
-            usuario: recipe.usuario || { username: 'Chef' }
-          }} 
+            chef: recipe.chef || { username: 'Chef' }
+          }}
           comments={comments}
           onClose={() => setShowDetails(false)}
           onCommentSubmit={handleCommentSubmit}
@@ -188,10 +231,11 @@ RecipePost.propTypes = {
     nivelDificultad: PropTypes.string,
     descripcion: PropTypes.string,
     likes: PropTypes.array,
-    usuario: PropTypes.shape({
+    chef: PropTypes.shape({
       _id: PropTypes.string,
-      avatar: PropTypes.string,
-      username: PropTypes.string
+      foto: PropTypes.string,
+      username: PropTypes.string,
+      role: PropTypes.string
     })
   }),
   user: PropTypes.shape({

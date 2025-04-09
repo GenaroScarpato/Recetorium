@@ -47,41 +47,6 @@ const Dashboard = () => {
     new Date(b.createdAt) - new Date(a.createdAt)
   );
 
-  if (loading) {
-    return (
-      <div className="recipe-app-layout">
-        <Header 
-          searchQuery={searchQuery} 
-          onSearchChange={(e) => setSearchQuery(e.target.value)}
-          user={user}
-        />
-        <div className="loading">
-          <div className="loading-spinner"></div>
-          <p>Cargando las mejores recetas para ti...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="recipe-app-layout">
-        <Header 
-          searchQuery={searchQuery} 
-          onSearchChange={(e) => setSearchQuery(e.target.value)}
-          user={user}
-        />
-        <div className="error">
-          <h2>¡Ups! Ocurrió un error</h2>
-          <p>{error}</p>
-          <button onClick={() => window.location.reload()} className="retry-button">
-            Intentar nuevamente
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="recipe-app-layout">
       <Header 
@@ -90,46 +55,37 @@ const Dashboard = () => {
         user={user}
       />
       
-      <div className="main-content">
-        {/* Columna izquierda - Menú */}
+      <div className="main-content-dashboard">
+        {/* Columna izquierda */}
         <div className="left-column">
           <h2>RECETORIUM</h2>
           <nav className="navigation-menu">
             <ul>
-              <li className="active">
-                <span className="icon">🏠</span>
-                <span>Inicio</span>
-              </li>
-              <li>
-                <span className="icon">📖</span>
-                <span>Mis recetas</span>
-              </li>
-              <li>
-                <span className="icon">📚</span>
-                <span>Guardadas</span>
-              </li>
-              <li>
-                <span className="icon">👥</span>
-                <span>Chefs</span>
-              </li>
-              <li>
-                <span className="icon">👤</span>
-                <span>Perfil</span>
-              </li>
+              <li className="active"><span className="icon">🏠</span>Inicio</li>
+              <li><span className="icon">📖</span>Mis recetas</li>
+              <li><span className="icon">📚</span>Guardadas</li>
+              <li><span className="icon">👥</span>Chefs</li>
+              <li><span className="icon">👤</span>Perfil</li>
             </ul>
           </nav>
         </div>
-        
-        {/* Columna central - Recetas */}
+
+        {/* Columna central */}
         <div className="center-column">
           <div className="recipes-feed">
-            {sortedRecipes.length > 0 ? (
+            {loading ? (
+              <div className="loading">
+                <div className="loading-spinner"></div>
+                <p>Cargando recetas...</p>
+              </div>
+            ) : error ? (
+              <div className="error">
+                <h2>Error</h2>
+                <p>{error}</p>
+              </div>
+            ) : sortedRecipes.length > 0 ? (
               sortedRecipes.map(recipe => (
-                <RecipePost 
-                  key={recipe._id}
-                  recipe={recipe}
-                  user={user}
-                />
+                <RecipePost key={recipe._id} recipe={recipe} user={user} />
               ))
             ) : (
               <div className="no-results">
@@ -140,19 +96,13 @@ const Dashboard = () => {
             )}
           </div>
         </div>
-        
-        {/* Columna derecha - Chefs */}
+
+        {/* Columna derecha */}
         <div className="right-column">
-          <div className="user-profile">
-            
-          
-          </div>
-          
           <div className="suggestions-header">
             <span>Chefs destacados</span>
             <button>Ver todos</button>
           </div>
-          
           <div className="recommended-chefs">
             {recommendedChefs.map((chef, index) => (
               <div className="chef-card" key={index}>
@@ -166,20 +116,6 @@ const Dashboard = () => {
                 <button className="follow-button">Seguir</button>
               </div>
             ))}
-          </div>
-          
-          <div className="footer-links">
-            <div className="links-row">
-              <a href="#">Información</a>
-              <a href="#">Ayuda</a>
-              <a href="#">Prensa</a>
-            </div>
-            <div className="links-row">
-              <a href="#">Privacidad</a>
-              <a href="#">Condiciones</a>
-              <a href="#">Empleo</a>
-            </div>
-            <div className="copyright">© 2023 Recetorium</div>
           </div>
         </div>
       </div>

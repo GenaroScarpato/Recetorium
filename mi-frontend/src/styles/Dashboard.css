@@ -1,13 +1,11 @@
-/* Dashboard.css */
-
+/* Layout principal */
 .recipe-app-layout {
   background-color: #f8f9fa;
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  padding-top: 10px; /* Aseguramos espacio para el header */
-  
 }
 
+/* Header */
 .header {
   position: fixed;
   top: 0;
@@ -18,55 +16,96 @@
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-.main-content {
+/* Contenedor principal */
+.main-content-dashboard {
   display: flex;
-  width: 100%;
   max-width: 1400px;
-  margin: 0 auto; /* Eliminamos el margin-top que causaba espacio */
+  margin: 0 auto;
+  padding-top: 75px;
+  min-height: calc(100vh - 75px);
+  position: relative;
+
+  /* Fondo degradado suave */
+  background: linear-gradient(135deg, #fdfcfb, #e2d1c3);
 }
 
+
+
+/* Columna izquierda */
 .left-column {
   width: 250px;
   position: fixed;
   left: 0;
-  top: 60px; /* Pegado al borde inferior del header */
-  bottom: 0;
+  top: 75px;
+  height: calc(100vh - 75px);
   padding: 15px;
   background: white;
   border-right: 1px solid #eaeaea;
   overflow-y: auto;
+  z-index: 10;
 }
 
-.center-column {
-  flex: 1;
-  margin-left: 250px;
-  margin-right: 300px;
-  padding: 15px 20px;
-  min-height: calc(100vh - 60px);
-}
-
+/* Columna derecha */
 .right-column {
   width: 300px;
   position: fixed;
   right: 0;
-  top: 60px; /* Pegado al borde inferior del header */
-  bottom: 0;
+  top: 75px;
+  height: calc(100vh - 75px);
   padding: 15px;
   background: white;
   overflow-y: auto;
   scrollbar-width: none;
+  z-index: 10;
 }
 
 .right-column::-webkit-scrollbar {
   display: none;
 }
 
-/* Asegurar que el contenido comience desde arriba */
-.recipes-feed {
-  padding-top: 0;
-  margin-top: 0;
+/* Columna central */
+.center-column {
+  flex: 1;
+  margin-left: 250px;
+  margin-right: 300px;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  min-height: calc(100vh - 75px);
+  box-sizing: border-box;
+
 }
-/* Navegación */
+
+/* Feed de recetas */
+.recipes-feed {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  
+}
+
+/* Contenedor de receta individual */
+.recipe-post-container {
+  width: 100%;
+  max-width: 1000px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.recipe-post-container {
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+
+/* Menú navegación */
 .navigation-menu ul {
   list-style: none;
   padding: 0;
@@ -100,14 +139,7 @@
   font-size: 22px;
 }
 
-/* Recetas */
-.recipes-feed {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-
-/* Sección de chefs recomendados */
+/* Chefs recomendados */
 .user-profile {
   display: flex;
   align-items: center;
@@ -142,6 +174,7 @@
   font-size: 14px;
 }
 
+/* Sección de chefs */
 .suggestions-header {
   display: flex;
   justify-content: space-between;
@@ -245,7 +278,7 @@
   margin-top: 15px;
 }
 
-/* Estados de carga y error */
+/* Estados */
 .loading, .error {
   text-align: center;
   padding: 3rem 2rem;
@@ -274,12 +307,21 @@
   color: #d32f2f;
 }
 
-/* Receta individual */
-.recipe-post {
-  background: rgb(203, 187, 187);
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  overflow: hidden;
+/* No results */
+.no-results {
+  text-align: center;
+  padding: 2rem;
+  width: 100%;
+}
+
+.no-results-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.no-results-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 /* Responsive */
@@ -287,20 +329,33 @@
   .right-column {
     display: none;
   }
-  
+
+  .main-content-dashboard {
+    padding-right: 0;
+  }
+
   .center-column {
     margin-right: 0;
-    border-right: none;
   }
 }
 
-@media (max-width: 768px) {
-  .left-column {
-    display: none;
+@media (max-width: 900px) {
+  .main-content-dashboard {
+    flex-direction: column;
+    padding: 75px 20px 0;
   }
-  
+
+  .left-column,
+  .right-column {
+    position: static;
+    width: 100%;
+    height: auto;
+    margin: 10px 0;
+  }
+
   .center-column {
-    margin-left: 0;
-    padding: 0 15px;
+    margin: 0;
+    width: 100%;
+    padding: 15px;
   }
 }

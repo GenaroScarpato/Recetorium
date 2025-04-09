@@ -1,11 +1,12 @@
+/* Estilos base */
 .loginPage {
   display: flex;
   min-height: 100vh;
 }
 
+/* Contenedor de ilustración */
 .loginIllustration {
   flex: 1;
-  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,7 +16,12 @@
   overflow: hidden;
 }
 
-.loginIllustration::before {
+/* Tema para Login (rosa) */
+.loginIllustration[data-theme="login"] {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+}
+
+.loginIllustration[data-theme="login"]::before {
   content: '';
   position: absolute;
   top: 0;
@@ -26,6 +32,23 @@
   opacity: 0.8;
 }
 
+/* Tema para Register (morado/azul) */
+.loginIllustration[data-theme="register"] {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.loginIllustration[data-theme="register"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('https://images.unsplash.com/photo-1547592180-85f173990554?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80') center/cover;
+  opacity: 0.8;
+}
+
+/* Estilos comunes */
 .illustrationContent {
   position: relative;
   z-index: 1;
@@ -57,8 +80,15 @@
   color: #333;
 }
 
+.registerTitle {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #764ba2;
+}
+
 .formGroup {
   margin-bottom: 1.5rem;
+  position: relative;
 }
 
 .formGroup label {
@@ -75,18 +105,72 @@
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.3s ease;
+  padding-right: 2.5rem;
 }
 
-.formGroup input:focus {
+/* Estilos focus por tema */
+[data-theme="login"] .formGroup input:focus {
   border-color: #ff9a9e;
   box-shadow: 0 0 0 3px rgba(255, 154, 158, 0.2);
   outline: none;
 }
 
+[data-theme="register"] .formGroup input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+  outline: none;
+}
+
+.passwordInputContainer {
+  position: relative;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+[data-theme="login"] .passwordToggle {
+  color: #ff9a9e;
+}
+
+[data-theme="register"] .passwordToggle {
+  color: #667eea;
+}
+
+.roleSelector {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.roleButton {
+  flex: 1;
+  padding: 0.75rem;
+  background: #f8f8f8;
+  color: #555;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.roleButton.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
 .submitButton {
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -95,6 +179,14 @@
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 1rem;
+}
+
+[data-theme="login"] .submitButton {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+}
+
+[data-theme="register"] .submitButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .submitButton:hover {
@@ -129,9 +221,30 @@
   text-align: center;
 }
 
-.linksContainer a {
+[data-theme="login"] .linksContainer a {
   color: #ff9a9e;
+}
+
+[data-theme="register"] .linksContainer a {
+  color: #667eea;
+}
+
+.loginLink {
+  font-weight: 600;
   text-decoration: none;
+}
+
+[data-theme="login"] .loginLink {
+  color: #ff9a9e;
+}
+
+[data-theme="register"] .loginLink {
+  color: #667eea;
+}
+
+.linksContainer a:hover,
+.loginLink:hover {
+  text-decoration: underline;
 }
 
 .errorMessage {
@@ -141,6 +254,20 @@
   border-radius: 8px;
   margin-bottom: 1.5rem;
   border-left: 4px solid #c62828;
+}
+
+.successMessage {
+  background: #e8f5e9;
+  color: #2e7d32;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #2e7d32;
+}
+
+.roleEmoji {
+  margin-top: 2rem;
+  font-size: 3rem;
 }
 
 @media (max-width: 768px) {
@@ -155,4 +282,20 @@
   .loginFormContainer {
     padding: 2rem 1.5rem;
   }
+
+  .roleSelector {
+    flex-direction: column;
+  }
+}
+
+.illustrationContent h2,
+.illustrationContent p {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+.illustrationContent {
+  background: rgba(0, 0, 0, 0.5); /* Fondo oscuro translúcido */
+  padding: 2rem;
+  border-radius: 12px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }

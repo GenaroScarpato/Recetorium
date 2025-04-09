@@ -8,7 +8,10 @@ function Register() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [role, setRole] = useState('CLIENTE');
 
   const validateUsername = (username) => {
     const errors = [];
@@ -55,6 +58,7 @@ function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const username = e.target.username.value;
     const password = e.target.password.value;
     const confirmPassword = e.target.confirmPassword.value;
@@ -67,6 +71,7 @@ function Register() {
 
     if (allErrors.length > 0) {
       setError(allErrors.join('\n'));
+      setIsLoading(false);
       return;
     }
 
@@ -74,14 +79,12 @@ function Register() {
       const registerResponse = await axios.post('http://localhost:3000/api/usuarios', {
         username,
         password,
+        role
       }, {
         withCredentials: true,
       });
 
       if (registerResponse.status === 201) {
-        setSuccess('Usuario registrado exitosamente. Iniciando sesión...');
-        setError('');
-
         try {
           const loginResponse = await axios.post('http://localhost:3000/api/login', {
             username,
@@ -94,48 +97,40 @@ function Register() {
             const { token, usuario, role, id } = loginResponse.data;
             login(token, { username: usuario, role, id });
             navigate('/');
-          } else {
-            setError('Error al iniciar sesión automáticamente: ' + 
-                    (loginResponse.data.message || 'Error desconocido'));
           }
         } catch (loginError) {
-          setError('Registro exitoso, pero falló el inicio de sesión automático: ' + 
-                  (loginError.response?.data?.message || loginError.message));
+          setError('Registro exitoso, pero falló el inicio de sesión automático');
           navigate('/login');
         }
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Error al registrar el usuario');
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  
   return (
-    <div className={styles.container}>
-      <div className={styles.wrapper}>
-        <h2 className={styles.title}>Registrarse</h2>
+<div className={styles.loginPage} data-theme="register">
 
-        <form onSubmit={handleRegister} className={styles.form}>
-          <div className={styles.formGroup}>
-            <label htmlFor="username">Usuario:</label>
-            <input type="text" id="username" name="username" className={styles.input} required />
+<div 
+  className={styles.loginIllustration}
+  data-theme="register"
+>
+           <div className={styles.illustrationContent}>
+          <h2>Únete a nuestra comunidad</h2>
+          <p>Comparte tus recetas y descubre nuevas creaciones</p>
+          <div className={styles.roleEmoji}>
+            {role === 'CHEF' ? '👨‍🍳' : '🍽️'}
           </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="password">Contraseña:</label>
-            <input type="password" id="password" name="password" className={styles.input} required />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="confirmPassword">Confirmar Contraseña:</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              className={styles.input}
-              required
-            />
-          </div>
-
+        </div>
+      </div>
+      
+      <div className={styles.loginFormContainer}>
+        <div className={styles.loginFormWrapper}>
+          <h1 className={styles.registerTitle}>Crear Cuenta</h1>
+          
           {error && (
             <div className={styles.errorMessage}>
               {error.split('\n').map((line, index) => (
@@ -143,15 +138,102 @@ function Register() {
               ))}
             </div>
           )}
+          
+          <form onSubmit={handleRegister}>
+            <div className={styles.formGroup}>
+              <label htmlFor="username">Nombre de Usuario</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Ej: chef_maria"
+                required
+                autoComplete="username"
+              />
+            </div>
 
-          {success && <div className={styles.successMessage}>{success}</div>}
-
-          <button type="submit" className={styles.button}>Registrarse</button>
-
-          <div className={styles.loginLink}>
-            ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
-          </div>
-        </form>
+            {/* Selector de Rol */}
+            <div className={styles.formGroup}>
+              <label>¿Cuál será tu rol?</label>
+              <div className={styles.roleSelector}>
+                {['CLIENTE', 'CHEF'].map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setRole(r)}
+                    className={`${styles.roleButton} ${role === r ? styles.active : ''}`}
+                  >
+                    {r === 'CHEF' ? 'Soy Chef' : 'Soy Cliente'}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div className={styles.formGroup}>
+              <label htmlFor="password">Contraseña</label>
+              <div className={styles.passwordInputContainer}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  placeholder="Mínimo 8 caracteres con mayúsculas, números y símbolos"
+                  required
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={styles.passwordToggle}
+                >
+                  {showPassword ? '🙈' : '👁️'}
+                </button>
+              </div>
+            </div>
+            
+            <div className={styles.formGroup}>
+              <label htmlFor="confirmPassword">Confirmar Contraseña</label>
+              <div className={styles.passwordInputContainer}>
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  placeholder="Repite tu contraseña"
+                  required
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className={styles.passwordToggle}
+                >
+                  {showConfirmPassword ? '🙈' : '👁️'}
+                </button>
+              </div>
+            </div>
+            
+            <button 
+              type="submit" 
+              disabled={isLoading} 
+              className={styles.submitButton}
+              aria-busy={isLoading}
+            >
+              {isLoading ? (
+                <span className={styles.spinner} aria-hidden="true"></span>
+              ) : (
+                'Registrarse'
+              )}
+            </button>
+            
+            <div className={styles.linksContainer}>
+              <p>
+                ¿Ya tienes cuenta?{' '}
+                <Link to="/login" className={styles.loginLink}>
+                  Inicia sesión
+                </Link>
+              </p>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

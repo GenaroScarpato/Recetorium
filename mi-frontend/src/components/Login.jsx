@@ -30,7 +30,6 @@ function Login() {
         }
       });
   
-      console.log('Respuesta completa:', response.data); // Para debug
   
       if (response.data.token) {  // Cambiamos la condición de éxito
         await login(response.data.token, {
@@ -54,9 +53,13 @@ function Login() {
   };
 
   return (
-    <div className={styles.loginPage}>
-      <div className={styles.loginIllustration}>
-        <div className={styles.illustrationContent}>
+<div className={styles.loginPage} data-theme="login">
+
+<div 
+  className={styles.loginIllustration}
+  data-theme="login"
+>
+       <div className={styles.illustrationContent}>
           <h2>Bienvenido a Recetorium</h2>
           <p>Descubre el chef que llevas dentro con nuestras recetas paso a paso</p>
         </div>
