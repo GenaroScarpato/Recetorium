@@ -3,7 +3,9 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import Header from './Header';
 import RecipePost from './RecipePost';
+import NavigationSidebar from './NavigationSidebar';
 import '../styles/Dashboard.css';
+
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -55,20 +57,9 @@ const Dashboard = () => {
         user={user}
       />
       
-      <div className="main-content-dashboard">
         {/* Columna izquierda */}
-        <div className="left-column">
-          <h2>RECETORIUM</h2>
-          <nav className="navigation-menu">
-            <ul>
-              <li className="active"><span className="icon">🏠</span>Inicio</li>
-              <li><span className="icon">📖</span>Mis recetas</li>
-              <li><span className="icon">📚</span>Guardadas</li>
-              <li><span className="icon">👥</span>Chefs</li>
-              <li><span className="icon">👤</span>Perfil</li>
-            </ul>
-          </nav>
-        </div>
+      <div className="main-content-dashboard">
+        <NavigationSidebar />
 
         {/* Columna central */}
         <div className="center-column">

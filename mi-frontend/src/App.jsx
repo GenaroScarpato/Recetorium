@@ -6,24 +6,26 @@ import Login from './components/Login';
 import Home from './components/Home';
 import Register from './components/Register';
 import ProfilePage from './components/ProfilePage';
-import RecipePost from './components/RecipePost';
 import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 import axios from 'axios';
+import ChefsPage from './components/ChefsPage';
+// Páginas placeholder (sin estilos, solo JSX)
+const MisRecetas = () => <h2>Mis Recetas</h2>;
+const Guardadas = () => <h2>Guardadas</h2>;
 
-// Componente mejorado para rutas privadas
+// Ruta privada
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
+
   useEffect(() => {
-    // Verificar autenticación si está cargando
     if (isLoading) {
-      axios.get('/api/verify-auth', { withCredentials: true })
-        .catch(() => {});
+      axios.get('/api/verify-auth', { withCredentials: true }).catch(() => {});
     }
   }, [isLoading]);
-  if (isLoading) {
-    return <div>Cargando...</div>; // O un spinner de carga
-  }
+
+  if (isLoading) return <div>Cargando...</div>;
+
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
@@ -38,13 +40,17 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={   <Dashboard />  } />
-        <Route path="/perfil" element={<ProfilePage />} />
-
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/perfil" element={
+          <PrivateRoute>
+            <ProfilePage />
+          </PrivateRoute>
+        } />
         <Route path="/receta/:id" element={<RecipeDetails />} />
+        <Route path="/mis-recetas" element={<MisRecetas />} />
+        <Route path="/guardadas" element={<Guardadas />} />
+        <Route path="/chefs" element={<ChefsPage />} />
         <Route path="*" element={<Navigate to="/" />} />
-        <Route path="/receta/:id" element={<RecipePost />} />
-
       </Routes>
     </AuthProvider>
   );

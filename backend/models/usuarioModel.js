@@ -44,6 +44,10 @@ const deleteById = async (id) => {
 const updateById = async (id, ingredienteActualizado) => {
     return await Usuario.findByIdAndUpdate(id, ingredienteActualizado, { new: true });
 }
+const getChefs = async () => {
+    return await Usuario.find({ role: 'CHEF' }).select('username foto role');
+};
+
 module.exports = {
     Usuario,
     getUsuarios,
@@ -51,5 +55,6 @@ module.exports = {
     add,
     getById,
     deleteById,
-    updateById
+    updateById,
+    getChefs
 };

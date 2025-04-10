@@ -148,10 +148,21 @@ const deleteById = async (req, res) => {
         res.status(404).json({ error: `Usuario con ID ${id} no encontrado` });
     }
 };
+
+const getChefs = async (req, res) => {
+    try {
+        const chefs = await usuarioModel.getChefs();
+        res.json(chefs);
+    } catch (error) {
+        res.status(500).json({ error: 'Hubo un error al obtener los chefs' });
+    }
+};
+
 module.exports = {
     getUsuarios,
     getUsuarioById,
     addUsuario,
     deleteById,
-    updateById
+    updateById,
+    getChefs
 }
