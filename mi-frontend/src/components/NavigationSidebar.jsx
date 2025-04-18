@@ -1,8 +1,14 @@
-// components/NavigationSidebar.jsx
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import '../styles/Dashboard.css';
 
 const NavigationSidebar = () => {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) return null; // o un spinner si querés
+
+  const esChef = user?.role === 'CHEF';
+
   return (
     <div className="left-column">
       <h2>RECETORIUM</h2>
@@ -13,11 +19,15 @@ const NavigationSidebar = () => {
               <span className="icon">🏠</span> Inicio
             </Link>
           </li>
-          <li>
-            <Link to="/mis-recetas" className="nav-link">
-              <span className="icon">📖</span> Mis recetas
-            </Link>
-          </li>
+
+          {esChef && (
+            <li>
+              <Link to="/mis-recetas" className="nav-link">
+                <span className="icon">📖</span> Mis recetas
+              </Link>
+            </li>
+          )}
+
           <li>
             <Link to="/guardadas" className="nav-link">
               <span className="icon">📚</span> Guardadas
@@ -40,3 +50,4 @@ const NavigationSidebar = () => {
 };
 
 export default NavigationSidebar;
+    

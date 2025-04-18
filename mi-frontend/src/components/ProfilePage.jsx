@@ -7,6 +7,8 @@ const ProfilePage = () => {
   const { user } = useAuth();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -25,28 +27,89 @@ const ProfilePage = () => {
     }
   }, [user]);
 
-  if (loading) {
-    return <div className="loading">Cargando perfil...</div>;
-  }
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
+  };
 
-  if (!userData) {
-    return <div className="error">Error al cargar el perfil</div>;
-  }
+  const handleImageUpload = async (e) => {
+    e.preventDefault();
+    if (!selectedFile) return;
 
-  // ✅ Lógica para foto de perfil
+    const formData = new FormData();
+    formData.append('foto', selectedFile);
+
+    try {
+      setUpdating(true);
+      const response = await axios.patch(`/api/usuarios/${user.id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        withCredentials: true
+      });
+
+      if (response.data.updatedUser) {
+        setUserData(response.data.updatedUser);
+        setSelectedFile(null);
+      }
+    } catch (error) {
+      console.error("Error al actualizar la foto:", error);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleRemoveImage = async () => {
+    try {
+      setUpdating(true);
+      const response = await axios.patch(`/api/usuarios/${user.id}`, {
+        foto: 'url_default_foto_perfil'
+      }, { withCredentials: true });
+
+      if (response.data.updatedUser) {
+        setUserData(response.data.updatedUser);
+      }
+    } catch (error) {
+      console.error("Error al eliminar la foto:", error);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  if (loading) return <div className="loading">Cargando perfil...</div>;
+  if (!userData) return <div className="error">Error al cargar el perfil</div>;
+
   const defaultImage = 'https://res.cloudinary.com/dkpwnkhza/image/upload/v1741732506/usuarios/vwmsergnpyzw8ktvq8yg.png';
   const profileImage = userData.foto && userData.foto !== 'url_default_foto_perfil' ? userData.foto : defaultImage;
 
   return (
     <div className="profile-page-container">
       <div className="profile-header">
-        <img 
-          src={profileImage}
-          alt="Foto de perfil"
-          className="profile-avatar-large"
-        />
+        <div className="profile-avatar-wrapper">
+          <img 
+            src={profileImage}
+            alt="Foto de perfil"
+            className="profile-avatar-large"
+          />
+          <div className="avatar-overlay">
+            <label htmlFor="fileInput" className="icon-button edit-icon">✏️</label>
+            <button className="icon-button delete-icon" onClick={handleRemoveImage}>🗑️</button>
+            <input
+              id="fileInput"
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+            />
+          </div>
+        </div>
         <h1>{userData.username}</h1>
         <p className="member-since">Miembro desde: {new Date(userData.fechaRegistro).toLocaleDateString()}</p>
+
+        {selectedFile && (
+          <form onSubmit={handleImageUpload} className="upload-form">
+            <button type="submit" disabled={updating}>
+              {updating ? 'Actualizando...' : 'Guardar nueva foto'}
+            </button>
+          </form>
+        )}
       </div>
 
       <div className="profile-details">

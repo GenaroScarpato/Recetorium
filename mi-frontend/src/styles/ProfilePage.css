@@ -1,85 +1,175 @@
 .profile-page-container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
 }
-  
-  .profile-header {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-  
-  .profile-avatar-large {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 5px solid #fff;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  }
-  
-  .member-since {
-    color: #666;
-    font-style: italic;
-  }
-  
-  .profile-details {
-    background: #fff;
-    border-radius: 10px;
-    padding: 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  }
-  
-  .profile-section {
-    margin-bottom: 2rem;
-  }
-  
-  .profile-section h2 {
-    color: #e63946;
-    border-bottom: 2px solid #f1f1f1;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .detail-row {
-    display: flex;
-    margin-bottom: 1rem;
-  }
-  
-  .detail-label {
-    font-weight: bold;
-    width: 120px;
-    color: #555;
-  }
-  
-  .detail-value {
-    flex: 1;
-  }
-  
-  .recipes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1rem;
-  }
-  
-  .recipe-card {
-    background: #f9f9f9;
-    padding: 1rem;
-    border-radius: 8px;
-    transition: transform 0.3s;
-  }
-  
-  .recipe-card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .loading, .error {
-    text-align: center;
-    padding: 2rem;
-    font-size: 1.2rem;
-  }
-  
-  .error {
-    color: #e63946;
-  }
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.profile-avatar-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-avatar-large {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 6px solid #fff;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+.avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.profile-avatar-wrapper:hover .avatar-overlay {
+  opacity: 1;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.icon-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+}
+
+/* Cambiar a íconos de bote de basura */
+.icon-edit {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #4a90e2; /* color azul */
+  cursor: pointer;
+}
+
+.icon-delete {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #e63946; /* color rojo */
+  cursor: pointer;
+}
+
+.icon-edit:hover, .icon-delete:hover {
+  color: #1c6dd0; /* cambio de color al hacer hover */
+  transform: scale(1.1);
+}
+
+.icon-delete:hover {
+  color: #d32f2f; /* cambio de color para eliminar */
+}
+
+.member-since {
+  color: #666;
+  font-style: italic;
+}
+
+.profile-details {
+  background: #fff;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.profile-section {
+  margin-bottom: 2rem;
+}
+
+.profile-section h2 {
+  color: #e63946;
+  border-bottom: 2px solid #f1f1f1;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.detail-label {
+  font-weight: bold;
+  width: 120px;
+  color: #555;
+}
+
+.detail-value {
+  flex: 1;
+}
+
+.recipes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.recipe-card {
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+  transition: transform 0.3s;
+}
+
+.recipe-card:hover {
+  transform: translateY(-5px);
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+}
+
+.error {
+  color: #e63946;
+}
+
+.upload-form {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.upload-form input[type="file"] {
+  padding: 0.5rem;
+}
+
+.upload-form button {
+  padding: 0.5rem 1rem;
+  background-color: #5a67d8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.upload-form button:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+}

@@ -36,7 +36,7 @@ const Chef = () => {
         <NavigationSidebar />
         <div className="center-column">
           <div className="recipes-feed">
-            <h1>Usuarios Registrados</h1>
+            <h1>Chefs Registrados en Recetorium</h1>
 
             {loading ? (
               <div className="loading">

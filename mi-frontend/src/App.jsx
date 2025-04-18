@@ -10,10 +10,11 @@ import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 import axios from 'axios';
 import ChefsPage from './components/ChefsPage';
-// Páginas placeholder (sin estilos, solo JSX)
-const MisRecetas = () => <h2>Mis Recetas</h2>;
-const Guardadas = () => <h2>Guardadas</h2>;
+import MisRecetas from './components/MisRecetas';
+//import Guardadas from './components/Guardadas';
 
+//const MisRecetas = () => <h2>Mis Recetas</h2>;
+const Guardadas = () => <h2>Recetas Guardadas</h2>;
 // Ruta privada
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();

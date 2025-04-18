@@ -229,6 +229,18 @@ async function calcularCostoReceta(idReceta) {
   }
 }
 
+// GET RECETAS BY CHEF ID
+const getByChefId = async (chefId) => {
+  return await Receta.find({ chef: chefId })
+    .populate({
+      path: 'chef',
+      select: 'username foto'
+    })
+    .populate({
+      path: 'ingredientes.ingrediente',
+      select: 'nombre'
+    });
+};
 module.exports = {
   Receta,
   getAll,
@@ -238,5 +250,6 @@ module.exports = {
   add,
   buscarPorIngredientes,
   buscarPorTipoComida,
-  calcularCostoReceta
+  calcularCostoReceta,
+  getByChefId
 };

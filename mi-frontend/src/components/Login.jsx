@@ -33,7 +33,7 @@ function Login() {
   
       if (response.data.token) {  // Cambiamos la condición de éxito
         await login(response.data.token, {
-          username: response.data.usuario,  // Asegúrate que coincide con "usuario"
+          username: response.data.usuario,  
           role: response.data.role,
           id: response.data.id,
           foto: response.data.foto

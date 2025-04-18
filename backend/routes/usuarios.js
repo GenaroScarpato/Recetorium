@@ -9,6 +9,6 @@ router.get('/',[validarJwt,validarAdmin], getUsuarios); // Obtener todos los usu
 router.get('/:id', getUsuarioById); // Obtener un usuario por ID
 router.post('/', addUsuario); // Crear un nuevo usuario
 router.delete('/:id',[validarJwt,validarAdmin], deleteById); // Eliminar un usuario por ID
-router.patch('/:id',[validarJwt,validarAdmin], updateById);
+router.patch('/:id',[validarJwt], updateById);
 
 module.exports = router;
