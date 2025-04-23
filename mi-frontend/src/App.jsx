@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Dashboard from './components/Dashboard';
-import RecipeDetails from './components/RecipeDetails';
 import Login from './components/Login';
 import Home from './components/Home';
 import Register from './components/Register';
@@ -47,7 +46,6 @@ function App() {
             <ProfilePage />
           </PrivateRoute>
         } />
-        <Route path="/receta/:id" element={<RecipeDetails />} />
         <Route path="/mis-recetas" element={<MisRecetas />} />
         <Route path="/guardadas" element={<Guardadas />} />
         <Route path="/chefs" element={<ChefsPage />} />

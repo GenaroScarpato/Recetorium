@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import Header from './Header';
+import Footer from './Footer';
 import '../styles/Home.css';
 
 const Home = () => {
@@ -170,17 +171,8 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="footer">
-        <div className="footer-content">
-          <div className="footer-logo">RECETORIUM</div>
-          <nav className="footer-nav">
-            <Link to="/about">Nosotros</Link>
-            <Link to="/contact">Contacto</Link>
-            <Link to="/blog">Blog</Link>
-          </nav>
-        </div>
-        <div className="copyright">© {new Date().getFullYear()} Recetorium. Todos los derechos reservados.</div>
-      </footer>
+      <Footer />
+
     </div>
   );
 };

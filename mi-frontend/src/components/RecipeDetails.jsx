@@ -12,7 +12,6 @@ const RecipeDetails = ({
   onLike,
   isLiked
 }) => {
-  console.log("🔍 Objeto recipe:", recipe);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -57,7 +56,7 @@ const RecipeDetails = ({
               <img
                 src={recipe.foto || defaultImage}
                 alt={`Foto de la receta ${recipe.nombre}`}
-                className="recipe-image"
+                className="recipe-image-details"
               />
             </div>
 

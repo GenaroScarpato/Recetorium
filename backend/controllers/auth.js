@@ -39,6 +39,10 @@ const login = async (req, res) => {
         res.cookie('user', usuario.username, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', maxAge: 2 * 60 * 60 * 1000 });
         res.cookie('role', usuario.role, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', maxAge: 2 * 60 * 60 * 1000 });
         res.cookie('id', usuario._id, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', maxAge: 2 * 60 * 60 * 1000 });
+        res.cookie('recetasGuardadas', usuario.recetasGuardadas, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', maxAge: 2 * 60 * 60 * 1000 });
+        res.cookie('seguidores', usuario.seguidores, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', maxAge: 2 * 60 * 60 * 1000 });
+        res.cookie('siguiendo', usuario.siguiendo, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', maxAge: 2 * 60 * 60 * 1000 });
+    
 
         // Enviar respuesta exitosa
         res.status(200).json({
@@ -46,7 +50,10 @@ const login = async (req, res) => {
             id: usuario._id,
             role: usuario.role,
             token,
-            foto: usuario.foto
+            foto: usuario.foto,
+            recetasGuardadas: usuario.recetasGuardadas, // IDs de recetas
+            seguidores: usuario.seguidores, // IDs de seguidores
+            siguiendo: usuario.siguiendo  // IDs de usuarios que sigue
         });
 
     } catch (error) {
@@ -64,6 +71,7 @@ const verifyAuth = async (req, res) => {
         // Obtener el token de las cookies
         const token = req.cookies.token;
 
+        console.log("Token de autenticación:", token);
         if (!token) {
             return res.status(401).json({ message: 'No autorizado' });
         }
@@ -84,7 +92,10 @@ const verifyAuth = async (req, res) => {
                 id: usuario._id,
                 username: usuario.username,
                 role: usuario.role,
-                foto:  usuario.foto
+                foto:  usuario.foto,
+                recetasGuardadas: usuario.recetasGuardadas, // IDs de recetas
+                seguidores: usuario.seguidores, // IDs de seguidores
+                siguiendo: usuario.siguiendo  // IDs de usuarios que sigue
             },
         });
     } catch (error) {

@@ -3,6 +3,7 @@ const fs = require('fs'); // Importa el módulo "fs" para manejar archivos
 const path = require('path'); // Importa el módulo "path" para manejar rutas
 const fileUpload = require('express-fileupload'); // Para manejar la subida de archivos
 const cloudinary = require('../config/cloudinaryConfig'); // Importa la configuración de Cloudinary
+
 // Obtener todos los usuarios
 const getUsuarios = async (req, res) => {
     try {
@@ -29,8 +30,7 @@ const getUsuarioById = async (req, res) => {
     }
 }
 
-
-
+// Agregar un nuevo usuario
 const addUsuario = async (req, res) => {
     try {
         const { username, password, role = 'CLIENTE' } = req.body; // Asigna 'CLIENTE' por defecto
@@ -93,9 +93,10 @@ const addUsuario = async (req, res) => {
     }
 };
 
+// Actualizar un usuario por ID
 const updateById = async (req, res) => {
     const { id } = req.params;
-
+console.log("ID del usuario a actualizar:", id); // Verifica el ID recibido
     try {
         // Verifica si se subió una nueva foto
         let fotoUrl = req.body.foto; // Se preserva la foto si no se actualiza
@@ -123,6 +124,7 @@ const updateById = async (req, res) => {
 
             // Actualiza la foto con la nueva URL
             fotoUrl = result.secure_url;
+            console.log("URL de la nueva foto:", fotoUrl);
         }
 
         // Combina los datos del usuario con los nuevos (si hay)
@@ -139,6 +141,7 @@ const updateById = async (req, res) => {
     }
 }
 
+// Eliminar un usuario por ID
 const deleteById = async (req, res) => {
     const { id } = req.params;
     try {
@@ -149,6 +152,7 @@ const deleteById = async (req, res) => {
     }
 };
 
+// Obtener chefs
 const getChefs = async (req, res) => {
     try {
         const chefs = await usuarioModel.getChefs();
@@ -158,11 +162,152 @@ const getChefs = async (req, res) => {
     }
 };
 
+const getRecetasGuardadas = async (req, res) => {
+    const { userId } = req.params;
+    
+    try {
+        const result = await usuarioModel.getRecetasGuardadas(userId);
+        
+        if (!result) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+        
+        res.status(200).json(result.recetasGuardadas);
+    } catch (error) {
+        console.error('Error al obtener recetas guardadas:', error);
+        res.status(500).json({ error: 'Error al obtener recetas guardadas' });
+    }
+};
+
+// Guardar receta
+const guardarReceta = async (req, res) => {
+    const { userId, recetaId } = req.body;
+    
+    try {
+        // Verificar si la receta existe
+        const receta = await Receta.findById(recetaId);
+        if (!receta) {
+            return res.status(404).json({ error: 'Receta no encontrada' });
+        }
+        
+        // Verificar si ya está guardada
+        const usuario = await usuarioModel.getById(userId);
+        if (usuario.recetasGuardadas.includes(recetaId)) {
+            return res.status(400).json({ error: 'La receta ya está guardada' });
+        }
+        
+        const usuarioActualizado = await usuarioModel.guardarReceta(userId, recetaId);
+        res.status(200).json(usuarioActualizado.recetasGuardadas);
+    } catch (error) {
+        console.error('Error al guardar receta:', error);
+        res.status(500).json({ error: 'Error al guardar receta' });
+    }
+};
+
+// Eliminar receta guardada
+const eliminarRecetaGuardada = async (req, res) => {
+    const { userId, recetaId } = req.params;
+    
+    try {
+        const usuarioActualizado = await usuarioModel.eliminarRecetaGuardada(userId, recetaId);
+        
+        if (!usuarioActualizado) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+        
+        res.status(200).json(usuarioActualizado.recetasGuardadas);
+    } catch (error) {
+        console.error('Error al eliminar receta guardada:', error);
+        res.status(500).json({ error: 'Error al eliminar receta guardada' });
+    }
+};
+
+// Obtener usuarios seguidos
+const getSeguidos = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await usuarioModel.getSeguidos(id);
+        if (!result) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        res.status(200).json(result.siguiendo || []); // ← importante
+    } catch (error) {
+        console.error('Error al obtener seguidos:', error);
+        res.status(500).json({ error: 'Error al obtener seguidos' });
+    }
+};
+
+// Obtener seguidores
+const getSeguidores = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await usuarioModel.getSeguidores(id);
+
+        if (!result) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        res.status(200).json(result.seguidores || []); // ← importante
+    } catch (error) {
+        console.error('Error al obtener seguidores:', error);
+        res.status(500).json({ error: 'Error al obtener seguidores' });
+    }
+};
+
+
+// Seguir usuario
+const seguirUsuario = async (req, res) => {
+    const { seguidorId, usuarioId } = req.body;
+    
+    try {
+        if (seguidorId === usuarioId) {
+            return res.status(400).json({ error: 'No puedes seguirte a ti mismo' });
+        }
+        
+        const usuarioASeguir = await usuarioModel.getById(usuarioId);
+        if (!usuarioASeguir) {
+            return res.status(404).json({ error: 'Usuario a seguir no encontrado' });
+        }
+        
+        const seguidor = await usuarioModel.seguirUsuario(seguidorId, usuarioId);
+        res.status(200).json(seguidor.siguiendo);
+    } catch (error) {
+        console.error('Error al seguir usuario:', error);
+        res.status(500).json({ error: 'Error al seguir usuario' });
+    }
+};
+
+// Dejar de seguir
+const dejarDeSeguir = async (req, res) => {
+    const { seguidorId, usuarioId } = req.params;
+    
+    try {
+        const seguidor = await usuarioModel.dejarDeSeguir(seguidorId, usuarioId);
+        
+        if (!seguidor) {
+            return res.status(404).json({ error: 'Seguidor no encontrado' });
+        }
+        
+        res.status(200).json(seguidor.siguiendo);
+    } catch (error) {
+        console.error('Error al dejar de seguir:', error);
+        res.status(500).json({ error: 'Error al dejar de seguir' });
+    }
+};
 module.exports = {
     getUsuarios,
     getUsuarioById,
     addUsuario,
     deleteById,
     updateById,
-    getChefs
-}
+    getChefs,
+    getRecetasGuardadas,
+    guardarReceta,
+    eliminarRecetaGuardada,
+    getSeguidos,
+    getSeguidores,
+    seguirUsuario,
+    dejarDeSeguir
+};

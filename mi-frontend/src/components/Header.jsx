@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Header.css';
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'; // Asegúrate de importar PropTypes
 
-const Header = ({ searchQuery, setSearchQuery }) => {
+const Header = ({ searchQuery = "", setSearchQuery = () => {} }) => {
   const { isAuthenticated, user, logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -74,13 +74,11 @@ const Header = ({ searchQuery, setSearchQuery }) => {
     </header>
   );
 };
-Header.defaultProps = {
-  setSearchQuery: () => {},
+
+// Aquí añadimos la validación para las props
+Header.propTypes = {
+  searchQuery: PropTypes.string.isRequired,
+  setSearchQuery: PropTypes.func.isRequired,
 };
 
-Header.propTypes = {
-    searchQuery: PropTypes.string.isRequired,
-    setSearchQuery: PropTypes.func.isRequired,
-  };
-  
 export default Header;

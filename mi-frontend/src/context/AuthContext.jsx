@@ -25,7 +25,11 @@ export function AuthProvider({ children }) {
               username: response.data.user.username,
               role: response.data.user.role,
               id: response.data.user.id,
-              foto: response.data.user.foto || 'https://res.cloudinary.com/dkpwnkhza/image/upload/v1741732506/usuarios/vwmsergnpyzw8ktvq8yg.png'
+              foto: response.data.user.foto || 'https://res.cloudinary.com/dkpwnkhza/image/upload/v1741732506/usuarios/vwmsergnpyzw8ktvq8yg.png',
+              recetasGuardadas: response.data.user.recetasGuardadas,
+              seguidores: response.data.user.seguidores,
+              siguiendo: response.data.user.siguiendo
+
             },
             isAuthenticated: true,
             isLoading: false
@@ -55,7 +59,10 @@ export function AuthProvider({ children }) {
       username: userData.username,
       role: userData.role,
       id: userData.id,
-      foto: userData.foto
+      foto: userData.foto,
+      recetasGuardadas: userData.recetasGuardadas,
+      seguidores: userData.seguidores,
+      siguiendo: userData.siguiendo
 
     },
     isAuthenticated: true,

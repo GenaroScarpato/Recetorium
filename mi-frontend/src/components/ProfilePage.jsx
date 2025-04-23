@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';  // Asegúrate de que useAuth está correctamente configurado
 import axios from 'axios';
 import '../styles/ProfilePage.css';
 
 const ProfilePage = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();  // Asegúrate de que el token está disponible en el contexto
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -39,15 +39,24 @@ const ProfilePage = () => {
     formData.append('foto', selectedFile);
 
     try {
+      console.log('Iniciando actualización de foto...');
       setUpdating(true);
+
+      // Usar el token de AuthContext
       const response = await axios.patch(`/api/usuarios/${user.id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}` // Usando el token desde el AuthContext
+        },
         withCredentials: true
       });
 
       if (response.data.updatedUser) {
+        console.log('Foto actualizada correctamente');
         setUserData(response.data.updatedUser);
         setSelectedFile(null);
+      } else {
+        console.log('No se pudo actualizar la foto');
       }
     } catch (error) {
       console.error("Error al actualizar la foto:", error);

@@ -96,7 +96,7 @@ const RecipePost = ({ recipe = {}, user = null }) => {
     }
   };
 
-  if (!recipe._id) return null;
+  if (!recipe || !recipe._id) return <div>Loading...</div>; // No renderiza si no hay receta válida
 
   // Mostrar solo los primeros 2 comentarios
   const visibleComments = comments.slice(0, 2);
