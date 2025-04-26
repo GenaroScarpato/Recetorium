@@ -3,12 +3,15 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import Header from './Header';
 import NavigationSideBar from './NavigationSidebar';
+import Footer from './Footer';
+import Modal from './ModalReceta';
 import '../styles/MisRecetas.css';
 
 const MisRecetas = () => {
   const [recetas, setRecetas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
@@ -19,9 +22,8 @@ const MisRecetas = () => {
           setLoading(false);
           return;
         }
-
-        const response = await axios.get(`/api/recetas/chef/${user.id}`, {
-          withCredentials: true // Usamos cookies en lugar de localStorage
+        const response = await axios.get(`/api/recetas/getMyRecipes`, {
+          withCredentials: true
         });
         setRecetas(response.data);
       } catch (err) {
@@ -37,10 +39,9 @@ const MisRecetas = () => {
     } else {
       setLoading(false);
     }
-  }, [user, isAuthenticated]); // Dependencias del efecto
+  }, [user, isAuthenticated]);
 
   const handleEdit = (id) => {
-    // Redirigir al formulario de edición
     window.location.href = `/editar-receta/${id}`;
   };
 
@@ -50,12 +51,32 @@ const MisRecetas = () => {
         await axios.delete(`/api/recetas/${id}`, {
           withCredentials: true
         });
-        // Actualizar la lista de recetas después de eliminar
         setRecetas(recetas.filter(receta => receta._id !== id));
       } catch (err) {
         console.error('Error al eliminar receta:', err);
         alert('No se pudo eliminar la receta');
       }
+    }
+  };
+
+  const handleAgregarReceta = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleAddRecipe = async (newRecipe) => {
+    try {
+      const response = await axios.post('/api/recetas', newRecipe, {
+        withCredentials: true
+      });
+      setRecetas([...recetas, response.data]);
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error('Error al agregar receta:', err);
+      alert('No se pudo agregar la receta');
     }
   };
 
@@ -70,13 +91,16 @@ const MisRecetas = () => {
         <NavigationSideBar />
         <div className="mis-recetas-container">
           <h1>Mis Recetas</h1>
+          <button className="agregar-receta-button" onClick={handleAgregarReceta}>
+            + Agregar Receta
+          </button>
           {recetas.length > 0 ? (
             <div className="recetas-grid">
               {recetas.map((receta) => (
                 <div key={receta._id} className="receta-card">
                   <h3>{receta.nombre}</h3>
                   <img 
-                    src={receta.imagen || '/default-recipe.jpg'} 
+                    src={receta.foto || '/default-recipe.jpg'} 
                     alt={receta.nombre} 
                     className="receta-image"
                   />
@@ -99,10 +123,16 @@ const MisRecetas = () => {
               ))}
             </div>
           ) : (
-            <p>No has subido ninguna receta aún.</p>
+            <p className="no-recipes-message">No has subido ninguna receta aún.</p>
           )}
         </div>
       </div>
+      <Footer />
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={handleCloseModal} 
+        onAddRecipe={handleAddRecipe}
+      />
     </div>
   );
 };

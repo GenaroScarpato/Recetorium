@@ -29,7 +29,7 @@ const validarJwt = async (req, res, next) => {
 
         // Pasar el usuario verificado al request para utilizarlo en otras rutas
         req.usuario = usuario;
-
+console.log("Usuario en validarJwt:", usuario);
         next();
     } catch (error) {
         res.status(401).json({

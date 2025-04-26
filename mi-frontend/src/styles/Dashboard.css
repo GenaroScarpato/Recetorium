@@ -27,7 +27,7 @@
   width: 100%;
   flex: 1;
   position: relative;
-  background: linear-gradient(135deg, #fdfcfb, #e2d1c3);
+  background-color: #f8f9fa;
 }
 
 /* Columna izquierda */
@@ -67,12 +67,12 @@
   flex: 1;
   margin-left: 250px;
   margin-right: 300px;
-  padding: 20px;
+  padding: 20px 40px 100px;
   display: flex;
-  justify-content: center;
-  min-height: calc(100vh - 75px - 100px); /* Resta altura del footer */
+  flex-direction: column; /* Cambié a columna para que todo se apile */
+  align-items: center; /* Centrar todo */
+  min-height: calc(100vh - 75px - 100px);
   box-sizing: border-box;
-  padding-bottom: 100px; /* Espacio para el footer */
 }
 
 /* Feed de recetas */
@@ -80,21 +80,11 @@
   width: 100%;
   max-width: 1000px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 25px;
+  flex-direction: column; /* Ahora en columna para mejor flujo */
+  gap: 20px;
 }
 
-/* Contenedor de receta individual */
-.recipe-post-container {
-  width: 100%;
-  max-width: 1000px;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  background: white;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-}
+
 
 /* Menú navegación */
 .nav-link {
@@ -167,7 +157,7 @@
   object-fit: cover;
   margin-right: 15px;
   border: 2px solid #f8f9fa;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .user-info {
@@ -260,17 +250,6 @@
   color: #115293;
 }
 
-/* Footer */
-.footer {
-  width: 100%;
-  background: #1e1e1e;
-  color: white;
-  padding: 3rem 5% 2rem;
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
-  z-index: 100;
-  position: relative;
-}
-
 /* Estados */
 .loading, .error {
   text-align: center;
@@ -278,7 +257,7 @@
   font-size: 1.2rem;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .loading-spinner {

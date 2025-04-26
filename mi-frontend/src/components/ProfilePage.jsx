@@ -1,29 +1,37 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';  // Asegúrate de que useAuth está correctamente configurado
+import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import '../styles/ProfilePage.css';
 
 const ProfilePage = () => {
-  const { user, token } = useAuth();  // Asegúrate de que el token está disponible en el contexto
+  const { user, token } = useAuth();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
   const [updating, setUpdating] = useState(false);
+  const [seguidores, setSeguidores] = useState([]);
+  const [seguidos, setSeguidos] = useState([]);
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(`/api/usuarios/${user.id}`);
-        setUserData(response.data);
+        const [userRes, seguidosRes, seguidoresRes] = await Promise.all([
+          axios.get(`/api/usuarios/${user.id}`),
+          axios.get(`/api/usuarios/seguidos/${user.id}`),
+          axios.get(`/api/usuarios/seguidores/${user.id}`)
+        ]);
+        setUserData(userRes.data);
+        setSeguidos(seguidosRes.data);
+        setSeguidores(seguidoresRes.data);
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.error("Error al cargar datos del perfil:", error);
       } finally {
         setLoading(false);
       }
     };
 
     if (user?.id) {
-      fetchUserData();
+      fetchData();
     }
   }, [user]);
 
@@ -39,24 +47,18 @@ const ProfilePage = () => {
     formData.append('foto', selectedFile);
 
     try {
-      console.log('Iniciando actualización de foto...');
       setUpdating(true);
-
-      // Usar el token de AuthContext
       const response = await axios.patch(`/api/usuarios/${user.id}`, formData, {
-        headers: { 
+        headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}` // Usando el token desde el AuthContext
+          'Authorization': `Bearer ${token}`
         },
         withCredentials: true
       });
 
       if (response.data.updatedUser) {
-        console.log('Foto actualizada correctamente');
         setUserData(response.data.updatedUser);
         setSelectedFile(null);
-      } else {
-        console.log('No se pudo actualizar la foto');
       }
     } catch (error) {
       console.error("Error al actualizar la foto:", error);
@@ -92,7 +94,7 @@ const ProfilePage = () => {
     <div className="profile-page-container">
       <div className="profile-header">
         <div className="profile-avatar-wrapper">
-          <img 
+          <img
             src={profileImage}
             alt="Foto de perfil"
             className="profile-avatar-large"
@@ -109,8 +111,14 @@ const ProfilePage = () => {
             />
           </div>
         </div>
+
         <h1>{userData.username}</h1>
-        <p className="member-since">Miembro desde: {new Date(userData.fechaRegistro).toLocaleDateString()}</p>
+
+        {/* NUEVA SECCIÓN: Seguidores y Seguidos */}
+        <div className="followers-summary">
+          <span><strong>{seguidores.length}</strong> seguidores</span>
+          <span><strong>{seguidos.length}</strong> seguidos</span>
+        </div>
 
         {selectedFile && (
           <form onSubmit={handleImageUpload} className="upload-form">

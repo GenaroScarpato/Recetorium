@@ -74,7 +74,6 @@ const { get } = require('http');
         }
     
         // Actualiza solo con los campos nuevos (no mergeamos con la receta existente)
-        console.log("🛠️ Campos finales para actualizar:", recetaActualizada);
     
         const updatedReceta = await recetasModel.updateById(id, recetaActualizada);
     
@@ -349,10 +348,14 @@ const { get } = require('http');
         res.status(500).json({ error: error.message });
         }
     };
+
     const getMyRecipes = async (req, res) => {
+       console.log("entramos");
         try {
+          console.log('Usuario recibido en req.usuario:', req.usuario);
+      
           const chefId = req.usuario._id;
-          
+      
           if (req.usuario.role !== 'CHEF') {
             return res.status(403).json({ error: 'Solo los chefs pueden acceder a esta función' });
           }
@@ -364,7 +367,7 @@ const { get } = require('http');
           res.status(500).json({ error: 'Error al obtener las recetas del chef', message: error.message });
         }
       };
-    
+      
     
     module.exports = {
         getAll,

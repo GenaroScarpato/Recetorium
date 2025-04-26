@@ -87,7 +87,7 @@ const Dashboard = () => {
 
         {/* Columna central */}
         <div className="center-column">
-          <div className="recipes-feed">
+          <div className="full-post-view">
             {loading ? (
               <div className="loading">
                 <div className="loading-spinner"></div>

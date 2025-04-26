@@ -6,16 +6,18 @@ const {getAll, getById, deleteById, updateById, add, buscarRecetasPorIngrediente
      = require("../controllers/recetaController");
 const { validarJwt, validarAdmin } = require('../middlewares/validation');
 
+
+router.post('/buscarPorIngredientes', buscarRecetasPorIngredientes);
+router.post('/buscarPorTipoComida', buscarPorTipoComida);
+router.get('/calcularCostoReceta/:id', calcularCostoReceta);
+router.get('/getMyRecipes', [validarJwt], getMyRecipes);
 router.get('/', getAll);
 router.get('/all', getAll);
 router.get('/:id', getById);
 router.delete('/:id',[validarJwt,validarAdmin], deleteById);
 router.patch('/:id', updateById)
 router.post('/',[validarJwt,validarAdmin], add);
-router.post('/buscarPorIngredientes', buscarRecetasPorIngredientes);
-router.post('/buscarPorTipoComida', buscarPorTipoComida);
-router.get('/calcularCostoReceta/:id', calcularCostoReceta);
-router.get('/mis-recetas', [validarJwt], getMyRecipes);
+
  
 router.post('/:id/pasos', agregarPaso);
 router.get('/:id/completa', obtenerRecetaConComentarios);

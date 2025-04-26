@@ -1,24 +1,32 @@
-/* Instagram-style Post */
+/* Estilo para el contenedor del post */
 .social-post {
-  max-width: 500px;
-  margin: 0 auto 30px;
+  width: 100%;
+  max-width: 100%; /* Asegura que ocupe todo el ancho disponible */
+  margin: 0 auto 40px;
   background: #fff;
   border: 1px solid #dbdbdb;
   border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: row; /* Cambio aquí para mostrar los elementos de forma horizontal */
+  overflow: hidden;
+  gap: 20px; /* Espaciado entre la imagen y el contenido */
 }
 
 /* Header */
 .post-header {
-  padding: 14px 16px; 
+  padding: 10px 20px;
   display: flex;
   align-items: center;
   border-bottom: 1px solid #efefef;
+  margin-bottom: 12px;
+  width: 100%; /* Asegura que el header ocupe todo el ancho */
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .user-avatar {
@@ -36,7 +44,7 @@
 }
 
 .username {
-  font-weight: 500;
+  font-weight: 600;
   font-size: 14px;
   color: #333;
 }
@@ -46,35 +54,72 @@
 }
 
 .verified-badge {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   display: inline-block;
 }
 
-
-
-/* Image */
+/* Imagen de la receta */
 .post-image-container {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
+  width: 60%; /* La imagen ocupa el 40% del ancho */
+  max-height: 200px; 
+  flex-shrink: 0;
+  border-right: 1px solid #efefef; /* Separador entre imagen y contenido */
 }
 
 .post-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; /* Mantiene la proporción de la imagen */
 }
 
-/* Actions */
+/* Contenedor del contenido del post */
+.post-content-container {
+  width: 60%; /* El contenido ocupa el 60% del ancho */
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+/* Título de la receta */
+.recipe-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: #333;
+}
+
+/* Descripción del post */
+.post-caption {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  color: #333;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* Meta del post (fecha, etc.) */
+.recipe-meta {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+  color: #8e8e8e;
+  margin: 12px 0;
+}
+
+/* Fila de botones de acción (me gusta, comentar) */
 .post-buttons-row {
-  padding: 8px 16px;
+  padding: 12px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .action-buttons {
   display: flex;
   gap: 16px;
-  margin-bottom: 8px;
 }
 
 .like-button,
@@ -83,7 +128,7 @@
   border: none;
   font-size: 24px;
   cursor: pointer;
-  padding: 0;
+  color: #333;
 }
 
 .like-button.liked {
@@ -93,64 +138,53 @@
 .likes-count {
   font-weight: 600;
   font-size: 14px;
-  padding: 0 16px;
-  margin-bottom: 8px;
+  color: #333;
 }
 
-/* Content */
-.post-content {
-  padding: 0 16px 8px;
-}
-
-.post-caption {
-  margin: 0 0 8px 0;
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.post-caption .username {
-  margin-right: 5px;
-}
-
-.recipe-meta {
-  display: flex;
-  gap: 15px;
-  font-size: 13px;
-  color: #8e8e8e;
-  margin-top: 8px;
-}
-
-/* Comments */
+/* Sección de comentarios */
 .comments-section {
-  padding: 0 16px 16px;
-  border-top: 1px solid #efefef;
+  padding: 0;
 }
 
 .comments-list {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .comment {
   font-size: 14px;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  color: #333;
 }
 
 .comment-user {
   font-weight: 600;
-  margin-right: 5px;
 }
 
 .no-comments {
   color: #8e8e8e;
   font-size: 14px;
-  margin: 8px 0;
+  margin: 12px 0;
 }
 
-/* Comment Form */
+.view-all-comments {
+  background: none;
+  border: none;
+  color: #8e8e8e;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.view-all-comments:hover {
+  text-decoration: underline;
+}
+
+/* Formulario de comentarios */
 .comment-form {
   display: flex;
+  padding-top: 12px;
+  margin-top: 12px;
   border-top: 1px solid #efefef;
-  padding-top: 16px;
 }
 
 .comment-input {
@@ -158,11 +192,8 @@
   border: none;
   background: none;
   font-size: 14px;
-  padding: 0;
-}
-
-.comment-input:focus {
-  outline: none;
+  padding: 8px;
+  color: #333;
 }
 
 .comment-submit {
@@ -170,8 +201,9 @@
   background: none;
   color: #0095f6;
   font-weight: 600;
-  padding: 0;
+  padding: 8px 12px;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .comment-submit:disabled {
@@ -179,89 +211,64 @@
   cursor: default;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .social-post {
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-    margin-bottom: 15px;
-  }
-}
-
-.recipe-title {
-  text-align: center;
-  font-size: 18px;
-  font-weight: 600;
-  padding: 12px 16px 0;
-  margin: 0 0 8px 0;
-}
-
-.verified-badge {
-  font-size: 14px;
-  color: #1d9bf0; /* Azul estilo verificado */
-  margin-left: 4px;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.recipe-post-container {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto; /* CENTRA horizontalmente */
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  overflow: hidden;
-}
-.recipe-title {
-  text-align: center;
-  font-size: 18px;
-  font-weight: 600;
-  padding: 12px 16px 0;
-  margin: 0 0 8px 0;
-}
-
-
+/* Animaciones */
 @keyframes pop {
-  0% {
-    transform: scale(1);
-  }
-  40% {
-    transform: scale(1.4);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(1); }
+  40% { transform: scale(1.4); }
+  100% { transform: scale(1); }
 }
 
 .like-button.liked {
-  color: #ed4956;
   animation: pop 0.4s ease;
 }
+
 @keyframes fadeInComment {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .comment.new {
   animation: fadeInComment 0.3s ease forwards;
 }
-.view-all-comments {
-  background: none;
-  border: none;
-  color: #007bff;
-  cursor: pointer;
-  padding: 0;
-  font-size: 14px;
-  margin-top: 5px;
-}
-.view-all-comments:hover {
-  text-decoration: underline;
+
+/* Responsive */
+@media (max-width: 768px) {
+  .social-post {
+    flex-direction: column; /* Cambia a vertical en pantallas pequeñas */
+    gap: 0; /* Elimina el espacio entre imagen y contenido */
+  }
+  
+  /* Ajustes en la imagen para pantallas pequeñas */
+  .post-image-container {
+    width: 100%;
+    height: auto;
+    border-right: none; /* Elimina la separación en móviles */
+  }
+
+  .post-image {
+    height: 250px; /* Ajuste para mantener la relación de aspecto */
+  }
+
+  .post-content-container {
+    width: 100%;
+    padding: 10px;
+  }
+
+  /* Aumento del tamaño del título */
+  .recipe-title {
+    font-size: 18px;
+  }
+  
+  .post-caption {
+    font-size: 14px;
+  }
+
+  .like-button,
+  .comment-button {
+    font-size: 20px;
+  }
+
+  .likes-count {
+    font-size: 16px;
+  }
 }

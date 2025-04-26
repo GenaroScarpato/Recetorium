@@ -71,7 +71,6 @@ const verifyAuth = async (req, res) => {
         // Obtener el token de las cookies
         const token = req.cookies.token;
 
-        console.log("Token de autenticación:", token);
         if (!token) {
             return res.status(401).json({ message: 'No autorizado' });
         }
@@ -85,7 +84,6 @@ const verifyAuth = async (req, res) => {
         if (!usuario) {
             return res.status(401).json({ message: 'No autorizado' });
         }
-
         // Devolver los datos del usuario
         res.status(200).json({
             user: {
