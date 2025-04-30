@@ -16,7 +16,7 @@ const add = async (usuarioId, recetaId, texto) => {
 };
 const getTodos = async () => {
   return await Comentario.find()
-    .populate('usuarioId', 'username -_id')  // Selecciona solo el 'username' y excluye el '_id'
+    .populate('usuarioId', 'username -_id')  // Selecciona  el 'username' y la y excluye el '_id'
     .populate('recetaId', 'nombre -_id');    // Selecciona solo el 'titulo' y excluye el '_id'
 };
 

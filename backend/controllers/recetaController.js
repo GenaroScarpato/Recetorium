@@ -240,7 +240,8 @@ const { get } = require('http');
                 .populate('comentarios')
                 .populate({
                     path: 'comentarios.usuarioId',
-                    select: 'username'
+                    select: 'username', 
+                    select: 'foto'
                 });
                 
             if (!receta) return res.status(404).json({ error: 'Receta no encontrada' });
