@@ -29,7 +29,6 @@ const validarJwt = async (req, res, next) => {
 
         // Pasar el usuario verificado al request para utilizarlo en otras rutas
         req.usuario = usuario;
-console.log("Usuario en validarJwt:", usuario);
         next();
     } catch (error) {
         res.status(401).json({
@@ -50,7 +49,19 @@ const validarAdmin = async(req, resp, next) => {
         }
 }
 
+const validarRol = async(req, resp, next) => {
+    const usuario = req.usuario;     
+    const rolAValidar = req.params.rol;
+        if (usuario.role === rolAValidar) {
+            next();
+        } else {
+            resp.status(401).json({
+                msg: "No tenes permisos de " + rolAValidar  + " para esta acción"   
+            })
+        }
+}
 module.exports = {
     validarJwt,
-    validarAdmin
+    validarAdmin,
+    validarRol
 }

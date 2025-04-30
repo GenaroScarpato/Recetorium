@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const ingredienteSchema = new mongoose.Schema({
     nombre: { type: String, required: true },
-    foto: { type: String, required: true }
 }, {versionKey  : false});
 
 const Ingrediente = mongoose.model('Ingrediente', ingredienteSchema);
@@ -10,6 +9,7 @@ const Ingrediente = mongoose.model('Ingrediente', ingredienteSchema);
 const getTodos = async () => {
     return await Ingrediente.find();
 }
+
 
 const getById = async (id) => {
     return await Ingrediente.findById(id);
@@ -19,19 +19,15 @@ const deleteById = async (id) => {
     try {
         const recetasModel = require('./recetaModel');
         const recetasConIngrediente = await recetasModel.buscarPorIngredientes(id);
-        console.log(`Recetas encontradas con el ingrediente ID ${id}:`, recetasConIngrediente);
 
         if (recetasConIngrediente.length > 0) {
-            console.log(`Eliminando ${recetasConIngrediente.length} recetas con ingrediente de ID: ${id}`);
             await Promise.all(
                 recetasConIngrediente.map(async (receta) => {
                     await recetasModel.deleteById(receta._id);  // Eliminamos cada receta por su ID
-                    console.log(`Receta con ID ${receta._id} eliminada`);
                 })
             );
         }
         const ingredienteEliminado = await Ingrediente.findByIdAndDelete(id);
-        console.log(`Ingrediente eliminado:`, ingredienteEliminado);
 
         return {
             ingredienteEliminado,
@@ -56,6 +52,7 @@ const getByName = async (nombre) => {
     return await Ingrediente.findOne({ nombre });
 };
 
+
 module.exports = {
     Ingrediente,
     getTodos,
@@ -64,5 +61,4 @@ module.exports = {
     updateById,
     add,
     getByName,
-
 }

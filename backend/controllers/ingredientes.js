@@ -134,12 +134,11 @@ const addMany = async (req, res) => {
     }
 };
 
-
 module.exports = {
     getTodos,
     getById,
     deleteById,
     updateById,
     add,
-    addMany
+    addMany,
 }

@@ -91,16 +91,12 @@ const deleteById = async (req, res) => {
         }
 
         // Agrega console.log para depuración
-        console.log("Comentario encontrado:", comentario);
-        console.log("Usuario desde el token:", usuario);
+        
 
         // Verifica si el usuario es el autor del comentario o un administrador
         const comentarioUsuarioId = comentario.usuarioId._id.toString(); // Accede al _id del usuario en el comentario
-        console.log("ID de usuario del comentario:", comentarioUsuarioId);
-        console.log("ID de usuario desde el token:", usuario._id.toString());
-
+       
         if (comentarioUsuarioId !== usuario._id.toString() && usuario.role !== 'ADMIN') {
-            console.log("Acceso denegado: usuario no es el autor ni administrador");
             return res.status(403).json({ error: 'No tienes permisos para eliminar este comentario' });
         }
 
@@ -109,7 +105,6 @@ const deleteById = async (req, res) => {
         res.status(200).json({ message: `Comentario con ID ${id} eliminado correctamente` });
 
     } catch (error) {
-        console.log("Error en la eliminación:", error);
         res.status(500).json({ error: 'Hubo un error al eliminar el comentario' });
     }
 };

@@ -47,7 +47,6 @@ const { get } = require('http');
         try {
         let recetaActualizada = { ...req.body };
     
-        console.log("📤 PATCH recibido:", recetaActualizada);
     
         // Subida de nueva imagen (opcional)
         if (req.files && req.files.foto) {
@@ -93,74 +92,74 @@ const { get } = require('http');
 
     const add = async (req, res) => {
         try {
-            let fotoUrl = null;
-
-            // Caso 1: Si se sube un archivo de imagen
-            if (req.files && req.files.foto) {
-                const file = req.files.foto;
-
-                // Verifica si el archivo tiene una ruta temporal
-                if (!file.tempFilePath) {
-                    return res.status(400).json({ error: 'El archivo de imagen no es válido' });
-                }
-
-                // Sube la nueva imagen a Cloudinary
-                const result = await cloudinary.uploader.upload(file.tempFilePath, {
-                    folder: 'recetas', // Opcional: Organiza las imágenes en una carpeta
-                });
-
-                // Elimina el archivo temporal después de subirlo a Cloudinary
-                fs.unlink(file.tempFilePath, (err) => {
-                    if (err) {
-                        console.error("Error al eliminar el archivo temporal:", err);
-                    } else {
-                        console.log("Archivo temporal eliminado:", file.tempFilePath);
-                    }
-                });
-
-                fotoUrl = result.secure_url; // URL de la imagen subida a Cloudinary
+          let fotoUrl = null;
+      
+          if (req.files && req.files.foto) {
+            const file = req.files.foto;
+      
+            if (!file.tempFilePath) {
+              return res.status(400).json({ error: 'El archivo de imagen no es válido' });
             }
-            // Caso 2: Si se proporciona una URL de imagen directamente
-            else if (req.body.foto) {
-                fotoUrl = req.body.foto; // Usa la URL proporcionada en el cuerpo de la solicitud
-            }
-            // Caso 3: Si no se proporciona ninguna imagen
-            else {
-                fotoUrl = 'https://ejemplo.com/imagen-predeterminada.jpg'; // URL de imagen predeterminada
-            }
-
-            // Asegúrate de que "ingredientes" sea un array
-            let ingredientesArray = Array.isArray(req.body.ingredientes) ? req.body.ingredientes : [];
-
-            // Crea la receta con la URL de la imagen y los ingredientes
-            const nuevaReceta = {
-                ...req.body, // Todos los campos de la receta
-                foto: fotoUrl, // URL de la imagen (subida a Cloudinary, proporcionada o predeterminada)
-                ingredientes: ingredientesArray, // Usar el array de ingredientes
-            };
-
-            // Guarda la receta en la base de datos
-            const recetaAgregada = await recetasModel.add(nuevaReceta);
-
-            res.status(201).json({
-                message: 'Receta agregada exitosamente',
-                receta: recetaAgregada,
+      
+            const result = await cloudinary.uploader.upload(file.tempFilePath, {
+              folder: 'recetas',
             });
+      
+            fs.unlink(file.tempFilePath, (err) => {
+              if (err) console.error("Error al eliminar archivo temporal:", err);
+            });
+      
+            fotoUrl = result.secure_url;
+          } else if (req.body.foto) {
+            fotoUrl = req.body.foto;
+          } else {
+            fotoUrl = 'https://ejemplo.com/imagen-predeterminada.jpg';
+          }
+      
+          // ✅ Parseo seguro de JSON.stringify en 'ingredientes' y 'pasos'
+          let ingredientesArray = [];
+          let pasosArray = [];
+      
+          try {
+            ingredientesArray = JSON.parse(req.body.ingredientes || '[]');
+          } catch (err) {
+            return res.status(400).json({ error: 'Formato inválido para ingredientes' });
+          }
+      
+          try {
+            pasosArray = JSON.parse(req.body.pasos || '[]');
+          } catch (err) {
+            return res.status(400).json({ error: 'Formato inválido para pasos' });
+          }
+      
+          const nuevaReceta = {
+            ...req.body,
+            foto: fotoUrl,
+            ingredientes: ingredientesArray,
+            pasos: pasosArray,
+          };
+      
+          const recetaAgregada = await recetasModel.add(nuevaReceta);
+      
+          res.status(201).json({
+            message: 'Receta agregada exitosamente',
+            receta: recetaAgregada,
+          });
         } catch (error) {
-            // Manejo detallado de errores de validación
-            if (error.name === 'ValidationError') {
-                const errors = Object.values(error.errors).map(err => err.message);
-                return res.status(400).json({
-                    message: 'Error de validación',
-                    errors,
-                });
-            }
-            res.status(500).json({
-                message: 'Hubo un error al agregar la receta',
-                error: error.message,
+          if (error.name === 'ValidationError') {
+            const errors = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({
+              message: 'Error de validación',
+              errors,
             });
+          }
+          res.status(500).json({
+            message: 'Hubo un error al agregar la receta' + error.message,
+            error: error.message,
+          });
         }
-    };
+      };
+      
 
 
     const buscarRecetasPorIngredientes = async (req, res) => {
@@ -350,9 +349,7 @@ const { get } = require('http');
     };
 
     const getMyRecipes = async (req, res) => {
-       console.log("entramos");
         try {
-          console.log('Usuario recibido en req.usuario:', req.usuario);
       
           const chefId = req.usuario._id;
       

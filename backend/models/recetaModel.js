@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Ingrediente } = require('../models/ingredienteModel');
 const { consultarPrecio } = require('../services/preciosService');
-const Usuario = require('../models/usuarioModel'); // ⚠️ Importante para validar el rol CHEF
+const { Usuario } = require('../models/usuarioModel');
 
 const pasoRecetaSchema = new mongoose.Schema({
   orden: { type: Number, required: true },

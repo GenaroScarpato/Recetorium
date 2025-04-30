@@ -5,13 +5,16 @@ import Header from './Header';
 import NavigationSideBar from './NavigationSidebar';
 import Footer from './Footer';
 import Modal from './ModalReceta';
-import '../styles/MisRecetas.css';
+import RecipeDetails from './RecipeDetails'; // Asegúrate de que este componente esté disponible
+import styles from '../styles/MisRecetas.module.css';
 
 const MisRecetas = () => {
   const [recetas, setRecetas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
   const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
@@ -67,53 +70,91 @@ const MisRecetas = () => {
     setIsModalOpen(false);
   };
 
-  const handleAddRecipe = async (newRecipe) => {
+  const handleAddRecipe = async (receta) => {
     try {
-      const response = await axios.post('/api/recetas', newRecipe, {
-        withCredentials: true
+      const formData = new FormData();
+      formData.append('chef', user.id);
+      formData.append('nombre', receta.nombre);
+      formData.append('tipoComida', receta.tipoComida);
+      formData.append('tipoCocina', receta.tipoCocina);
+      formData.append('metodoCoccion', receta.metodoCoccion);
+      formData.append('tiempoPreparacion', receta.tiempoPreparacion);
+      formData.append('nivelDificultad', receta.nivelDificultad);
+      formData.append('ingredientePrincipal', receta.ingredientePrincipal);
+      formData.append('temporada', receta.temporada);
+
+      formData.append('ingredientes', JSON.stringify(receta.ingredientes));
+      formData.append('pasos', JSON.stringify(receta.pasos));
+
+      if (receta.foto instanceof File) {
+        formData.append('foto', receta.foto);
+      } else {
+        formData.append('foto', receta.foto || '');
+      }
+
+      const response = await axios.post('/api/recetas', formData, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
-      setRecetas([...recetas, response.data]);
+
+      setRecetas([...recetas, response.data.receta]);
       setIsModalOpen(false);
     } catch (err) {
       console.error('Error al agregar receta:', err);
-      alert('No se pudo agregar la receta');
+      if (err.response?.data?.message) {
+        alert(`Error: ${err.response.data.message}`);
+      } else {
+        alert('No se pudo agregar la receta (error inesperado)');
+      }
     }
   };
 
-  if (loading) return <div className="loading">Cargando recetas...</div>;
-  if (error) return <div className="error">{error}</div>;
-  if (!isAuthenticated) return <div className="error">Debes iniciar sesión para ver esta página</div>;
+  const handleViewDetails = (receta) => {
+    setSelectedRecipe(receta);
+    setShowDetails(true);
+  };
+
+  if (loading) return <div className={styles.loading}>Cargando recetas...</div>;
+  if (error) return <div className={styles.error}>{error}</div>;
+  if (!isAuthenticated) return <div className={styles.error}>Debes iniciar sesión para ver esta página</div>;
 
   return (
-    <div className="app-container">
+    <div className={styles.appContainer}>
       <Header />
-      <div className="main-content">
+      <div className={styles.mainContent}>
         <NavigationSideBar />
-        <div className="mis-recetas-container">
+        <div className={styles.misRecetasContainer}>
           <h1>Mis Recetas</h1>
-          <button className="agregar-receta-button" onClick={handleAgregarReceta}>
+          <button
+            className={styles.agregarRecetaButton}
+            onClick={handleAgregarReceta}
+          >
             + Agregar Receta
           </button>
+
           {recetas.length > 0 ? (
-            <div className="recetas-grid">
+            <div className={styles.recetasGrid}>
               {recetas.map((receta) => (
-                <div key={receta._id} className="receta-card">
+                <div key={receta._id} className={styles.recetaCard}>
                   <h3>{receta.nombre}</h3>
-                  <img 
-                    src={receta.foto || '/default-recipe.jpg'} 
-                    alt={receta.nombre} 
-                    className="receta-image"
+                  <img
+                    src={receta.foto || '/default-recipe.jpg'}
+                    alt={receta.nombre}
+                    className={styles.recetaImage}
+                    onClick={() => handleViewDetails(receta)} // Al hacer click muestra los detalles
                   />
                   <p>{receta.descripcion?.substring(0, 100)}...</p>
-                  <div className="actions">
-                    <button 
-                      className="edit-button" 
+                  <div className={styles.actions}>
+                    <button
+                      className={styles.editButton}
                       onClick={() => handleEdit(receta._id)}
                     >
                       Editar
                     </button>
-                    <button 
-                      className="delete-button" 
+                    <button
+                      className={styles.deleteButton}
                       onClick={() => handleDelete(receta._id)}
                     >
                       Eliminar
@@ -123,14 +164,36 @@ const MisRecetas = () => {
               ))}
             </div>
           ) : (
-            <p className="no-recipes-message">No has subido ninguna receta aún.</p>
+            <p className={styles.noRecipesMessage}>
+              No has subido ninguna receta aún.
+            </p>
           )}
         </div>
       </div>
       <Footer />
-      <Modal 
-        isOpen={isModalOpen} 
-        onClose={handleCloseModal} 
+
+      {/* Modal de detalles de receta */}
+      {showDetails && selectedRecipe && (
+        <RecipeDetails
+          recipe={{
+            ...selectedRecipe,
+            likes: selectedRecipe.likes?.length || 0,
+            chef: selectedRecipe.chef || { username: 'Chef' }
+          }}
+          comments={selectedRecipe.comments || []}
+          onClose={() => setShowDetails(false)}
+          onCommentSubmit={() => {}} // Si permites comentarios desde aquí
+          commentText={''}            // Lógica de comentarios
+          onCommentChange={() => {}}  // Lógica de comentarios
+          onLike={() => {}}           // Si permites likes aquí
+          isLiked={false}             // Si vas a manejar si la receta fue likeada
+        />
+      )}
+
+      {/* Modal para agregar nueva receta */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
         onAddRecipe={handleAddRecipe}
       />
     </div>

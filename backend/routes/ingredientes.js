@@ -1,7 +1,7 @@
 
 const express = require('express')
 const router = express.Router()
-const {getTodos, getById, deleteById, updateById, add, addMany} = require("../controllers/ingredientes");
+const {getTodos, getById, deleteById, updateById, add, addMany} = require('../controllers/ingredientes');
 const { validarJwt, validarAdmin } = require('../middlewares/validation');
 
 router.get('/', getTodos);
@@ -16,6 +16,7 @@ router.post('/', [validarJwt, validarAdmin], (req, res) => {
         add(req, res); // Si no, llamar a add
     }
 });
+
 
 
 module.exports = router;

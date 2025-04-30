@@ -14,9 +14,9 @@ router.get('/getMyRecipes', [validarJwt], getMyRecipes);
 router.get('/', getAll);
 router.get('/all', getAll);
 router.get('/:id', getById);
-router.delete('/:id',[validarJwt,validarAdmin], deleteById);
+router.delete('/:id',[validarJwt], deleteById);
 router.patch('/:id', updateById)
-router.post('/',[validarJwt,validarAdmin], add);
+router.post('/',[validarJwt], add);
 
  
 router.post('/:id/pasos', agregarPaso);

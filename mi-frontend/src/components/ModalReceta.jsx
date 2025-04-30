@@ -126,6 +126,13 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
     }
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFoto(file);
+    }
+  };
+  
   if (!isOpen) return null;
 
   return (
@@ -134,6 +141,7 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
         <button className="close-button" onClick={onClose}>X</button>
         <h2>Crear Nueva Receta</h2>
         {error && <p className="error-message">{error}</p>}
+
         
         <form onSubmit={handleSubmit} className="recipe-form">
           <div className="form-section">
@@ -148,6 +156,46 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
                 required
               />
             </div>
+            
+            <div className="form-group">
+              <label className="form-label">Seleccionar Foto</label>
+              <div className="file-upload-container">
+                <input
+                  id="file-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  name="foto"
+                  className="file-input"
+                  // Quitar el "required" del input y manejar la validación manualmente
+                />
+                <label htmlFor="file-upload" className="file-upload-button">
+                  📁 Subir Imagen
+                </label>
+              </div>
+
+              {foto && (
+                <div className="image-preview">
+                  <img 
+                    src={typeof foto === 'string' ? foto : URL.createObjectURL(foto)} 
+                    alt="Vista previa"
+                    className="preview-img"
+                  />
+                  <button 
+                    type="button" 
+                    className="remove-image-button"
+                    onClick={() => setFoto('')}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+              
+              {!foto && (
+                <p className="help-text">Por favor, sube una imagen para la receta.</p>
+              )}
+            </div>
+
 
             <div className="form-row">
               <div className="form-group">
@@ -271,16 +319,6 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
               </div>
             </div>
 
-            <div className="form-group">
-              <label>URL de la Foto</label>
-              <input
-                type="text"
-                value={foto}
-                onChange={(e) => setFoto(e.target.value)}
-                placeholder="https://ejemplo.com/foto.jpg"
-                required
-              />
-            </div>
           </div>
 
           <div className="form-section">
@@ -393,7 +431,17 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
             <button type="button" className="cancel-button" onClick={onClose}>
               Cancelar
             </button>
-            <button type="submit" className="submit-button">
+            <button 
+              type="submit" 
+              className="submit-button"
+              onClick={(e) => {
+                // Validar la foto antes de enviar
+                if (!foto) {
+                  e.preventDefault();
+                  setError('Por favor, sube una imagen para la receta');
+                }
+              }}
+            >
               Guardar Receta
             </button>
           </div>

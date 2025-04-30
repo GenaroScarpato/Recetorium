@@ -1,0 +1,125 @@
+/* MisRecetas.module.css */
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Asegura que el contenedor ocupe toda la altura */
+}
+
+.mainContent {
+  display: flex;
+  flex: 1;
+  margin-left: 240px; /* Ajusta este valor según el ancho de tu barra lateral */
+  overflow: auto; /* Permite el desplazamiento si el contenido es más grande que el contenedor */
+}
+
+.misRecetasContainer {
+  padding: 20px;
+  width: calc(100% - 240px); /* Ajusta el ancho restando el ancho de la barra lateral */
+  max-width: 1200px; /* Puedes ajustar este valor según lo que necesites */
+  margin: 0 auto; /* Centra el contenido */
+  height: 100%; /* Asegura que el contenedor ocupe todo el alto disponible */
+}
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.mainContent {
+  display: flex;
+  flex: 1;
+}
+
+.misRecetasContainer {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+
+.agregarRecetaButton {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+  margin-bottom: 20px; /* Espacio para separar el botón del contenido */
+}
+
+.recetasGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Establece 3 columnas de igual tamaño */
+  gap: 20px;
+  width: 100%; /* Asegura que la grilla ocupe todo el ancho disponible */
+}
+
+.recetaCard {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  height: 100%; /* Asegura que las tarjetas ocupen todo el alto disponible */
+}
+
+.recetaImage {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+  max-height: 200px; /* Limita la altura de las imágenes */
+}
+
+.actions {
+  margin-top: 10px;
+}
+
+.editButton, .deleteButton {
+  margin: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.editButton {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+}
+
+.editButton:hover {
+  background-color: #1976D2;
+}
+
+.deleteButton {
+  background-color: #f44336;
+  color: white;
+  border: none;
+}
+
+.deleteButton:hover {
+  background-color: #d32f2f;
+}
+
+.noRecipesMessage {
+  color: #666;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.loading {
+  color: blue;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.error {
+  color: red;
+  font-size: 18px;
+  font-weight: bold;
+}
