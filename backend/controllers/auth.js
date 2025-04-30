@@ -60,7 +60,7 @@ const login = async (req, res) => {
         console.log(error);
         res.status(500).json({
             status: 'error',
-            msg: 'Error interno del servidor'
+            msg: 'Lo sentimos, ocurrió un error en el servidor. Intenta nuevamente más tarde.'
         });
     }
 };

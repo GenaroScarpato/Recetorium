@@ -123,3 +123,20 @@
   font-size: 18px;
   font-weight: bold;
 }
+.likes, .comments {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.2rem; /* Tamaño de los iconos */
+  margin-bottom: 10px;
+}
+
+.likes {
+  color: #4caf50; /* Verde para los likes */
+}
+
+.comments {
+  margin-left: 5px;
+  color: #2196f3; /* Azul para los comentarios */
+}
+
+

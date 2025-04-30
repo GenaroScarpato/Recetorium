@@ -30,27 +30,35 @@ function Login() {
         }
       });
   
-  
-      if (response.data.token) {  // Cambiamos la condición de éxito
+      if (response.data.token) {
         await login(response.data.token, {
-          username: response.data.usuario,  
+          username: response.data.usuario,
           role: response.data.role,
           id: response.data.id,
           foto: response.data.foto
         });
         navigate('/');
       } else {
-        throw new Error(response.data.message || 'Error en el inicio de sesión');
+        throw new Error('No se recibió un token válido');
       }
+  
     } catch (err) {
       console.error('Error completo:', err.response?.data || err.message);
-      setError(err.response?.data?.message || 
-               err.message || 
-               'Error al conectar con el servidor');
+      const backendMsg = err.response?.data?.msg;
+  
+      if (err.response?.status === 401 && backendMsg?.startsWith('Credenciales inválidas')) {
+        setError('Usuario o contraseña incorrectos');
+      } else if (err.response?.status === 500) {
+        setError('Error del servidor. Intenta más tarde.');
+      } else {
+        setError(backendMsg || 'Ocurrió un error al iniciar sesión. Intenta de nuevo.');
+      }
+  
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   return (
 <div className={styles.loginPage} data-theme="login">

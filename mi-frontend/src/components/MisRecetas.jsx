@@ -133,7 +133,7 @@ const MisRecetas = () => {
           >
             + Agregar Receta
           </button>
-
+  
           {recetas.length > 0 ? (
             <div className={styles.recetasGrid}>
               {recetas.map((receta) => (
@@ -145,7 +145,20 @@ const MisRecetas = () => {
                     className={styles.recetaImage}
                     onClick={() => handleViewDetails(receta)} // Al hacer click muestra los detalles
                   />
-                  <p>{receta.descripcion?.substring(0, 100)}...</p>
+                  <div className={styles.interactions}>
+                    <p className={styles.likesComments}>
+                      <span className={styles.likes}>
+                         {receta.likes?.length || 0} 
+                         ❤️
+                         Me gusta
+                      </span>
+                      <span className={styles.comments}>
+                        {receta.comments?.length || 0} 
+                        💬
+                        Comentarios
+                      </span>
+                    </p>
+                  </div>
                   <div className={styles.actions}>
                     <button
                       className={styles.editButton}
@@ -165,13 +178,13 @@ const MisRecetas = () => {
             </div>
           ) : (
             <p className={styles.noRecipesMessage}>
-              No has subido ninguna receta aún.
+              ¡Aún no has subido ninguna receta! 🤔
             </p>
           )}
         </div>
       </div>
       <Footer />
-
+  
       {/* Modal de detalles de receta */}
       {showDetails && selectedRecipe && (
         <RecipeDetails
@@ -189,7 +202,7 @@ const MisRecetas = () => {
           isLiked={false}             // Si vas a manejar si la receta fue likeada
         />
       )}
-
+  
       {/* Modal para agregar nueva receta */}
       <Modal
         isOpen={isModalOpen}
@@ -198,6 +211,6 @@ const MisRecetas = () => {
       />
     </div>
   );
-};
-
+  
+}
 export default MisRecetas;
