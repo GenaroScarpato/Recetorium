@@ -8,7 +8,8 @@ import RecipeDetails from './RecipeDetails';
 
 const RecipePost = ({ recipe = {}, user = null }) => {
   const [commentText, setCommentText] = useState('');
-  const [isLiked, setIsLiked] = useState(recipe.likes?.includes(user?.id) || false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [comments, setComments] = useState([]);
   const [likesCount, setLikesCount] = useState(recipe.likes?.length || 0);
@@ -17,6 +18,9 @@ const RecipePost = ({ recipe = {}, user = null }) => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
+
+  
+
   const defaultImage = 'https://res.cloudinary.com/dkpwnkhza/image/upload/v1741732506/usuarios/vwmsergnpyzw8ktvq8yg.png';
   const profileImage = recipe.chef?.foto && recipe.chef.foto !== 'url_default_foto_perfil'
     ? recipe.chef.foto
@@ -24,6 +28,17 @@ const RecipePost = ({ recipe = {}, user = null }) => {
 
   const chefUsername = recipe.chef?.username || 'Chef';
 
+  // Actualiza isLiked e isSaved cuando se actualiza recipe o user
+  useEffect(() => {
+    if (recipe.likes && user?.id) {
+      setIsLiked(recipe.likes.includes(user.id));
+    }
+  
+    if (user?.recetasGuardadas && recipe?._id) {
+      setIsSaved(user.recetasGuardadas.includes(recipe._id));
+    }
+  }, [recipe.likes, recipe._id, user?.id, user?.recetasGuardadas]);
+  
   useEffect(() => {
     const fetchComments = async () => {
       try {
@@ -59,15 +74,42 @@ const RecipePost = ({ recipe = {}, user = null }) => {
     try {
       const endpoint = isLiked ? 'unlike' : 'like';
       await axios.post(
-        `/api/recetas/${recipe._id}/${endpoint}`,
-        {},
+        `/api/usuarios/${endpoint}`,
+        {
+          recetaId: recipe._id,
+          userId: user.id
+        },
         { withCredentials: true }
       );
+      console.log("Datos enviados:", { recetaId: recipe._id, userId: user.id });
       setIsLiked(!isLiked);
       setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
     } catch (error) {
       console.error('Error updating like:', error);
       setError('Error al actualizar like');
+    }
+  };
+
+  const handleSave = async () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const endpoint = isSaved ? 'unsave' : 'save';
+      await axios.post(
+        `/api/usuarios/${endpoint}`,
+        {
+          recetaId: recipe._id,
+          userId: user.id
+        },
+        { withCredentials: true }
+      );
+      setIsSaved(!isSaved);
+    } catch (error) {
+      console.error('Error saving recipe:', error);
+      setError('Error al guardar receta');
     }
   };
 
@@ -96,9 +138,8 @@ const RecipePost = ({ recipe = {}, user = null }) => {
     }
   };
 
-  if (!recipe || !recipe._id) return <div>Loading...</div>; // No renderiza si no hay receta válida
+  if (!recipe || !recipe._id) return <div>Loading...</div>;
 
-  // Mostrar solo los primeros 2 comentarios
   const visibleComments = comments.slice(0, 2);
 
   return (
@@ -138,6 +179,12 @@ const RecipePost = ({ recipe = {}, user = null }) => {
             {isLiked ? '❤️' : '🤍'}
           </button>
           <button className="comment-button">💬</button>
+          <button
+            className={`save-button ${isSaved ? 'saved' : ''}`}
+            onClick={handleSave}
+          >
+            {isSaved ? '🔖 Guardado' : '🔖 Guardar'}
+          </button>
         </div>
 
         <span className="likes-count">{likesCount} Me gusta</span>
@@ -174,7 +221,7 @@ const RecipePost = ({ recipe = {}, user = null }) => {
                   className="view-all-comments"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setShowDetails(true); // Mostrar el modal completo
+                    setShowDetails(true);
                   }}
                 >
                   Ver todos los comentarios
@@ -231,6 +278,7 @@ RecipePost.propTypes = {
     nivelDificultad: PropTypes.string,
     descripcion: PropTypes.string,
     likes: PropTypes.array,
+    savedBy: PropTypes.array,
     chef: PropTypes.shape({
       _id: PropTypes.string,
       foto: PropTypes.string,

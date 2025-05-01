@@ -10,11 +10,10 @@ import { useEffect } from 'react';
 import axios from 'axios';
 import ChefsPage from './components/ChefsPage';
 import MisRecetas from './components/MisRecetas';
+import Guardadas from './components/Guardadas';
 
-//import Guardadas from './components/Guardadas';
 
-//const MisRecetas = () => <h2>Mis Recetas</h2>;
-const Guardadas = () => <h2>Recetas Guardadas</h2>;
+
 // Ruta privada
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();

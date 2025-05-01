@@ -3,6 +3,7 @@ const fs = require('fs'); // Importa el módulo "fs" para manejar archivos
 const path = require('path'); // Importa el módulo "path" para manejar rutas
 const fileUpload = require('express-fileupload'); // Para manejar la subida de archivos
 const cloudinary = require('../config/cloudinaryConfig'); // Importa la configuración de Cloudinary
+const Receta = require('../models/recetaModel'); // Importa el modelo de receta
 
 // Obtener todos los usuarios
 const getUsuarios = async (req, res) => {
@@ -163,10 +164,9 @@ const getChefs = async (req, res) => {
 };
 
 const getRecetasGuardadas = async (req, res) => {
-    const { userId } = req.params;
-    
+    const { id } = req.params;
     try {
-        const result = await usuarioModel.getRecetasGuardadas(userId);
+        const result = await usuarioModel.getRecetasGuardadas(id);
         
         if (!result) {
             return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -180,19 +180,20 @@ const getRecetasGuardadas = async (req, res) => {
 };
 
 // Guardar receta
-const guardarReceta = async (req, res) => {
+const save = async (req, res) => {
     const { userId, recetaId } = req.body;
-    
+    console.log(req.body)
     try {
         // Verificar si la receta existe
-        const receta = await Receta.findById(recetaId);
+        const receta = await Receta.getById(recetaId);
         if (!receta) {
             return res.status(404).json({ error: 'Receta no encontrada' });
         }
         
         // Verificar si ya está guardada
         const usuario = await usuarioModel.getById(userId);
-        if (usuario.recetasGuardadas.includes(recetaId)) {
+        console.log(usuario)
+        if (usuario && Array.isArray(usuario.recetasGuardadas) && usuario.recetasGuardadas.includes(recetaId)) {
             return res.status(400).json({ error: 'La receta ya está guardada' });
         }
         
@@ -205,11 +206,13 @@ const guardarReceta = async (req, res) => {
 };
 
 // Eliminar receta guardada
-const eliminarRecetaGuardada = async (req, res) => {
-    const { userId, recetaId } = req.params;
-    
+const unsave = async (req, res) => {
+    console.log("Eliminando receta guardada...")
+    const { id, recetaId } = req.params;
+    console.log("ID del usuario:", id);
+    console.log("ID de la receta a eliminar:", recetaId);
     try {
-        const usuarioActualizado = await usuarioModel.eliminarRecetaGuardada(userId, recetaId);
+        const usuarioActualizado = await usuarioModel.eliminarRecetaGuardada(id, recetaId);
         
         if (!usuarioActualizado) {
             return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -304,8 +307,8 @@ module.exports = {
     updateById,
     getChefs,
     getRecetasGuardadas,
-    guardarReceta,
-    eliminarRecetaGuardada,
+    save,
+    unsave,
     getSeguidos,
     getSeguidores,
     seguirUsuario,

@@ -1,7 +1,7 @@
 const express = require('express');
 const { getUsuarios, getUsuarioById, addUsuario,deleteById,updateById ,getChefs, getRecetasGuardadas,
-    guardarReceta,
-    eliminarRecetaGuardada,
+    save,
+    unsave,
     getSeguidos,
     getSeguidores,
     seguirUsuario,
@@ -18,8 +18,8 @@ router.delete('/:id',[validarJwt,validarAdmin], deleteById); // Eliminar un usua
 router.patch('/:id',[validarJwt], updateById);
 //guardar recetas
 router.get('/:id/recetas-guardadas', [validarJwt], getRecetasGuardadas);
-router.post('/guardar-receta', [validarJwt], guardarReceta);
-router.delete('/:id/recetas-guardadas/:recetaId', [validarJwt], eliminarRecetaGuardada);
+router.post('/save', [validarJwt], save);
+router.post('/unsave', [validarJwt], unsave);
 
 // Followers
 router.get('/seguidos/:id', getSeguidos);

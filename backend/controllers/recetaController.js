@@ -349,6 +349,7 @@ const { get } = require('http');
         }
     };
 
+    //siendo chef obtengo las recetas que yo mismo subi
     const getMyRecipes = async (req, res) => {
         try {
       

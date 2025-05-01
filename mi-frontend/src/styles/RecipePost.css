@@ -272,3 +272,13 @@
     font-size: 16px;
   }
 }
+.save-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.save-button.saved {
+  color: #009688; /* o cualquier color que elijas */
+}

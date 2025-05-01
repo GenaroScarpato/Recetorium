@@ -65,16 +65,19 @@ const getChefs = async () => {
 };
 const getRecetasGuardadas = async (userId) => {
     return await Usuario.findById(userId)
-        .populate({
-            path: 'recetasGuardadas',
-            select: 'nombre descripcion foto tiempoPreparacion',
-            populate: {
-                path: 'usuario',
-                select: 'username foto'
-            }
-        })
-        .select('recetasGuardadas');
-};
+      .populate({
+        path: 'recetasGuardadas',
+        select: 'nombre descripcion foto tiempoPreparacion tipoComida tipoCocina ingredientes metodoCoccion nivelDificultad ingredientePrincipal temporada pasos comentarios likes likeCount',
+      })
+      .populate({
+        path: 'recetasGuardadas.chef',
+        select: 'nombre foto' // Solo seleccionamos nombre y foto del chef
+      })
+      .select('recetasGuardadas');
+  };
+  
+
+  
 
 const guardarReceta = async (userId, recetaId) => {
     return await Usuario.findByIdAndUpdate(
