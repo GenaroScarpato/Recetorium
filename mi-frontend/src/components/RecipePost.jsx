@@ -7,7 +7,6 @@ import '../styles/RecipePost.css';
 import RecipeDetails from './RecipeDetails';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-
 const RecipePost = ({ recipe = {} }) => {
   const [commentText, setCommentText] = useState('');
   const [isLiked, setIsLiked] = useState(false);
@@ -29,6 +28,9 @@ const RecipePost = ({ recipe = {} }) => {
   const chefUsername = recipe.chef?.username || 'Chef';
 
   useEffect(() => {
+    console.log("useEffect - recipe.likes:", recipe.likes);
+    console.log("useEffect - user.id:", user?.id);
+    
     if (recipe.likes && user?.id) {
       setIsLiked(recipe.likes.includes(user.id));
     }
@@ -54,7 +56,9 @@ const RecipePost = ({ recipe = {} }) => {
       try {
         setLoadingComments(true);
         setError(null);
+        console.log('Fetching comments...');
         const response = await axios.get(`/api/recetas/${recipe._id}/comentarios`);
+        console.log('Fetched comments:', response.data);
         setComments(response.data);
       } catch (error) {
         console.error('Error loading comments:', error);
@@ -73,6 +77,7 @@ const RecipePost = ({ recipe = {} }) => {
   const toggleDetails = (e) => {
     if (e.target.closest('button') || e.target.classList.contains('comment-input')) return;
     setShowDetails(!showDetails);
+    console.log('Toggling details:', showDetails);
   };
 
   const handleLike = async () => {
@@ -83,6 +88,7 @@ const RecipePost = ({ recipe = {} }) => {
 
     try {
       const endpoint = isLiked ? 'unlike' : 'like';
+      console.log(`Sending ${endpoint} request to /api/recetas/${recipe._id}/${endpoint}`);
       await axios.post(
         `/api/recetas/${recipe._id}/${endpoint}`,
         {
@@ -107,6 +113,7 @@ const RecipePost = ({ recipe = {} }) => {
 
     try {
       const endpoint = isSaved ? 'unsave' : 'save';
+      console.log(`Sending ${endpoint} request to /api/usuarios/${endpoint}`);
       await axios.post(
         `/api/usuarios/${endpoint}`,
         {
@@ -125,6 +132,7 @@ const RecipePost = ({ recipe = {} }) => {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
+
     if (!isAuthenticated) {
       navigate('/login');
       return;
@@ -135,10 +143,10 @@ const RecipePost = ({ recipe = {} }) => {
     try {
       const response = await axios.post(
         `/api/recetas/${recipe._id}/comentarios`,
-        { texto: commentText },
+        { texto: commentText , recetaId: recipe._id },
         { withCredentials: true }
       );
-
+      console.log('Comment submitted successfully:', response.data);
       setComments(prev => [...prev, { ...response.data, isNew: true }]);
       setCommentText('');
       setError(null);
@@ -156,26 +164,24 @@ const RecipePost = ({ recipe = {} }) => {
     }
 
     try {
-        const endpoint = isFollowing ? '/unfollow' : '/follow'; // Cambié aquí el endpoint
-        // Realiza la solicitud a la API de seguimiento o dejar de seguir
+        const endpoint = isFollowing ? '/unfollow' : '/follow'; 
+        console.log(`Sending ${endpoint} request to /api/usuarios/${endpoint}`);
         await axios({
-            method: isFollowing ? 'delete' : 'post', // Usa DELETE para unfollow, POST para follow
+            method: isFollowing ? 'delete' : 'post', 
             url: `/api/usuarios/${endpoint}`, 
             data: { 
-                seguidorId: user.id, // ID del usuario autenticado
-                usuarioId: recipe.chef._id, // ID del usuario objetivo (chef)
+                seguidorId: user.id,
+                usuarioId: recipe.chef._id,
             },
-            withCredentials: true, // Para mantener las cookies (sesión)
+            withCredentials: true,
         });
 
-        // Actualiza el estado para reflejar si el usuario está siguiendo o no
         setIsFollowing(!isFollowing);
     } catch (error) {
         console.error('Error al actualizar el estado de seguimiento:', error);
         setError('Error al seguir usuario');
     }
-};
-
+  };
 
   const visibleComments = comments.slice(0, 2);
 
@@ -220,21 +226,20 @@ const RecipePost = ({ recipe = {} }) => {
         <div className="recipe-title">{recipe.nombre}</div>
 
         <div className="post-buttons-row">
-  <div className="action-buttons">
-    <button className={`like-button ${isLiked ? 'liked' : ''}`} onClick={handleLike}>
-      {isLiked ? '❤️' : '🤍'}
-    </button>
-    <button className="comment-button">💬</button>
-  </div>
+          <div className="action-buttons">
+            <button className={`like-button ${isLiked ? 'liked' : ''}`} onClick={handleLike}>
+              {isLiked ? '❤️' : '🤍'}
+            </button>
+            <button className="comment-button">💬</button>
+          </div>
 
-  <button
-    className={`save-button ${isSaved ? 'saved' : ''}`}
-    onClick={handleSave}
-  >
-    <i className={`fa${isSaved ? 's' : 'r'} fa-bookmark`}></i>
-  </button>
-</div>
-
+          <button
+            className={`save-button ${isSaved ? 'saved' : ''}`}
+            onClick={handleSave}
+          >
+            <i className={`fa${isSaved ? 's' : 'r'} fa-bookmark`}></i>
+          </button>
+        </div>
 
         <span className="likes-count">{likesCount} Me gusta</span>
 
