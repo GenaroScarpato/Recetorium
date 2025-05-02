@@ -9,10 +9,10 @@ import "../styles/Dashboard.css";
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { user } = useAuth();
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user, isAuthenticated } = useAuth();
 
   const recommendedChefs = [
     {
@@ -50,16 +50,16 @@ const Dashboard = () => {
         setRecipes(response.data);
       } catch (error) {
         console.error("Error cargando recetas:", error);
-        setError(
-          "No se pudieron cargar las recetas. Por favor intenta nuevamente."
-        );
+        setError("No se pudieron cargar las recetas. Por favor intenta nuevamente.");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchRecipes();
-  }, []);
+  
+    if (isAuthenticated) {
+      fetchRecipes();
+    }
+  }, [isAuthenticated]); // Añade isAuthenticated como dependencia
 
   const filteredRecipes = recipes.filter((recipe) => {
     if (!recipe || !recipe.nombre) return false;
@@ -100,7 +100,10 @@ const Dashboard = () => {
               </div>
             ) : sortedRecipes.length > 0 ? (
               sortedRecipes.map((recipe) => (
-                <RecipePost key={recipe._id} recipe={recipe} user={user} />
+                <RecipePost key={recipe._id} recipe={recipe} user={user}  />
+ 
+
+
               ))
             ) : (
               <div className="no-results">

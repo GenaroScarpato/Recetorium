@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/RecipePost.css';
 import RecipeDetails from './RecipeDetails';
 
-const RecipePost = ({ recipe = {}, user = null }) => {
+const RecipePost = ({ recipe = {} }) => {
   const [commentText, setCommentText] = useState('');
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -15,11 +15,9 @@ const RecipePost = ({ recipe = {}, user = null }) => {
   const [likesCount, setLikesCount] = useState(recipe.likes?.length || 0);
   const [loadingComments, setLoadingComments] = useState(true);
   const [error, setError] = useState(null);
-  const { isAuthenticated } = useAuth();
+  const [isFollowing, setIsFollowing] = useState(false);
   const navigate = useNavigate();
-
-
-  
+  const { user, isAuthenticated, updateSavedRecipes } = useAuth();
 
   const defaultImage = 'https://res.cloudinary.com/dkpwnkhza/image/upload/v1741732506/usuarios/vwmsergnpyzw8ktvq8yg.png';
   const profileImage = recipe.chef?.foto && recipe.chef.foto !== 'url_default_foto_perfil'
@@ -28,17 +26,27 @@ const RecipePost = ({ recipe = {}, user = null }) => {
 
   const chefUsername = recipe.chef?.username || 'Chef';
 
-  // Actualiza isLiked e isSaved cuando se actualiza recipe o user
   useEffect(() => {
     if (recipe.likes && user?.id) {
       setIsLiked(recipe.likes.includes(user.id));
     }
-  
+
     if (user?.recetasGuardadas && recipe?._id) {
-      setIsSaved(user.recetasGuardadas.includes(recipe._id));
+      setIsSaved(
+        Array.isArray(user.recetasGuardadas) &&
+        user.recetasGuardadas.includes(recipe._id)
+      );
+    } else {
+      setIsSaved(false);
     }
-  }, [recipe.likes, recipe._id, user?.id, user?.recetasGuardadas]);
-  
+
+    if (user?.siguiendo && recipe.chef?._id) {
+      setIsFollowing(user.siguiendo.includes(recipe.chef._id));
+    } else {
+      setIsFollowing(false);
+    }
+  }, [recipe.likes, recipe._id, recipe.chef?._id, user]);
+
   useEffect(() => {
     const fetchComments = async () => {
       try {
@@ -74,14 +82,13 @@ const RecipePost = ({ recipe = {}, user = null }) => {
     try {
       const endpoint = isLiked ? 'unlike' : 'like';
       await axios.post(
-        `/api/usuarios/${endpoint}`,
+        `/api/recetas/${recipe._id}/${endpoint}`,
         {
           recetaId: recipe._id,
           userId: user.id
         },
         { withCredentials: true }
       );
-      console.log("Datos enviados:", { recetaId: recipe._id, userId: user.id });
       setIsLiked(!isLiked);
       setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
     } catch (error) {
@@ -107,6 +114,7 @@ const RecipePost = ({ recipe = {}, user = null }) => {
         { withCredentials: true }
       );
       setIsSaved(!isSaved);
+      updateSavedRecipes(recipe._id, isSaved ? 'unsave' : 'save');
     } catch (error) {
       console.error('Error saving recipe:', error);
       setError('Error al guardar receta');
@@ -138,27 +146,67 @@ const RecipePost = ({ recipe = {}, user = null }) => {
     }
   };
 
-  if (!recipe || !recipe._id) return <div>Loading...</div>;
+  const handleFollow = async (e) => {
+    e.stopPropagation();
+
+    // Verifica si el usuario está autenticado
+    if (!isAuthenticated) {
+        navigate('/login');
+        return;
+    }
+
+    try {
+        const endpoint = isFollowing ? '/unfollow' : '/follow'; // Cambié aquí el endpoint
+        // Realiza la solicitud a la API de seguimiento o dejar de seguir
+        await axios({
+            method: isFollowing ? 'delete' : 'post', // Usa DELETE para unfollow, POST para follow
+            url: `/api/usuarios/${endpoint}`, 
+            data: { 
+                seguidorId: user.id, // ID del usuario autenticado
+                usuarioId: recipe.chef._id, // ID del usuario objetivo (chef)
+            },
+            withCredentials: true, // Para mantener las cookies (sesión)
+        });
+
+        // Actualiza el estado para reflejar si el usuario está siguiendo o no
+        setIsFollowing(!isFollowing);
+    } catch (error) {
+        console.error('Error al actualizar el estado de seguimiento:', error);
+        setError('Error al seguir usuario');
+    }
+};
+
 
   const visibleComments = comments.slice(0, 2);
+
+  if (!recipe || !recipe._id) return <div>Loading...</div>;
 
   return (
     <div className="social-post">
       <div className="recipe-post-container" onClick={toggleDetails}>
         <div className="post-header">
-          <a href={`/perfil/${recipe.chef?._id}`} className="username-container" onClick={(e) => e.stopPropagation()}>
-            <img 
+          <div
+            className="username-container"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/perfil/${recipe.chef?._id}`);
+            }}
+          >
+            <img
               src={profileImage}
               alt={`Foto de ${chefUsername}`}
               className="user-avatar"
             />
             <span className="username">
               {chefUsername}
-              {recipe.chef?.role === 'CHEF' && (
-                <span className="verified-badge" title="Chef verificado">✔</span>
-              )}
             </span>
-          </a>
+          </div>
+
+          {user?.id !== recipe.chef?._id && (
+            <button className="follow-button" onClick={handleFollow}>
+              {isFollowing ? 'Siguiendo' : 'Seguir'}
+            </button>
+          )}
         </div>
 
         <div className="post-image-container">

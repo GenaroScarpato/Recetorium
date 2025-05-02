@@ -36,35 +36,30 @@ const Misguardadas = () => {
 
   return (
     <div className="saved-recipes-page">
-      {/* Encabezado */}
       <Header />
-
+  
       <div className="content-wrapper">
-        {/* Sidebar de navegación */}
         <Sidebar />
-
-        <main className="main-content">
-          <h2>Recetas Guardadas</h2>
-
-          {/* Mostrar mensaje si no hay recetas guardadas */}
+  
+        <div className="recipes-section">
+          <h3 className="recipes-title">Recetas Guardadas</h3>
+  
           {savedRecipes.length === 0 ? (
             <p>No tienes recetas guardadas.</p>
           ) : (
             <div className="recipes-grid">
-              {/* Mapear y mostrar las recetas guardadas */}
               {savedRecipes.map(recipe => (
-  <RecipePost key={recipe._id} recipe={recipe} user={user} />
-))}
-
+                <RecipePost key={recipe._id} recipe={recipe} user={user} />
+              ))}
             </div>
           )}
-        </main>
+        </div>
       </div>
-
-      {/* Pie de página */}
+  
       <Footer />
     </div>
   );
+  
 };
 
 export default Misguardadas;

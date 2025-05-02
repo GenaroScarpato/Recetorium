@@ -34,6 +34,13 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.user-avatar:hover {
+  transform: scale(1.1); /* Aumenta el tamaño al poner el mouse */
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2); /* Sombra al pasar el mouse */
+  cursor: pointer; /* Cambia el cursor a pointer */
 }
 
 .username-container {
@@ -41,6 +48,7 @@
   align-items: center;
   gap: 4px;
   text-decoration: none;
+  cursor: pointer; /* Añadido para indicar que el nombre es clickeable */
 }
 
 .username {
@@ -61,7 +69,7 @@
 
 /* Imagen de la receta */
 .post-image-container {
-  width: 60%; /* La imagen ocupa el 40% del ancho */
+  width: 100%; 
   max-height: 200px; 
   flex-shrink: 0;
   border-right: 1px solid #efefef; /* Separador entre imagen y contenido */
@@ -86,6 +94,9 @@
   font-weight: 600;
   margin: 0 0 12px 0;
   color: #333;
+  text-align: center; /* Centra el texto */
+
+
 }
 
 /* Descripción del post */
@@ -231,6 +242,33 @@
   animation: fadeInComment 0.3s ease forwards;
 }
 
+/* Botón Seguir */
+.follow-button {
+  display: inline-block;
+  background-color: #0095f6;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.follow-button:hover {
+  color: #0077cc; /* Cambio solo en el color del texto */
+  transform: scale(1.05); /* Efecto de aumento al poner el mouse */
+}
+
+/* Contenedor de seguidores */
+.follow-container {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .social-post {
@@ -263,15 +301,11 @@
     font-size: 14px;
   }
 
-  .like-button,
-  .comment-button {
-    font-size: 20px;
-  }
-
   .likes-count {
     font-size: 16px;
   }
 }
+
 .save-button {
   background: none;
   border: none;

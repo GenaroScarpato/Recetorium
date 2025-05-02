@@ -12,6 +12,7 @@ export function AuthProvider({ children }) {
     isLoading: true
   });
   const navigate = useNavigate();
+
   useEffect(() => {
     const verifyAuth = async () => {
       try {
@@ -26,10 +27,9 @@ export function AuthProvider({ children }) {
               role: response.data.user.role,
               id: response.data.user.id,
               foto: response.data.user.foto || 'https://res.cloudinary.com/dkpwnkhza/image/upload/v1741732506/usuarios/vwmsergnpyzw8ktvq8yg.png',
-              recetasGuardadas: response.data.user.recetasGuardadas,
-              seguidores: response.data.user.seguidores,
-              siguiendo: response.data.user.siguiendo
-
+              recetasGuardadas: response.data.user.recetasGuardadas || [],
+              seguidores: response.data.user.seguidores || [],
+              siguiendo: response.data.user.siguiendo || []
             },
             isAuthenticated: true,
             isLoading: false
@@ -54,22 +54,21 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (token, userData) => {
-  setAuthState({
-    user: {
-      username: userData.username,
-      role: userData.role,
-      id: userData.id,
-      foto: userData.foto,
-      recetasGuardadas: userData.recetasGuardadas,
-      seguidores: userData.seguidores,
-      siguiendo: userData.siguiendo
-
-    },
-    isAuthenticated: true,
-    isLoading: false
-  });
-  navigate('/');
-};
+    setAuthState({
+      user: {
+        username: userData.username,
+        role: userData.role,
+        id: userData.id,
+        foto: userData.foto,
+        recetasGuardadas: userData.recetasGuardadas || [],
+        seguidores: userData.seguidores || [],
+        siguiendo: userData.siguiendo || []
+      },
+      isAuthenticated: true,
+      isLoading: false
+    });
+    navigate('/');
+  };
 
   const logout = async () => {
     try {
@@ -88,12 +87,40 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const updateSavedRecipes = (recipeId, action) => {
+    setAuthState(prevState => {
+      if (!prevState.user) return prevState;
+      
+      const currentSavedRecipes = prevState.user.recetasGuardadas || [];
+      let updatedSavedRecipes;
+      
+      if (action === 'save') {
+        // Evitar duplicados
+        if (!currentSavedRecipes.includes(recipeId)) {
+          updatedSavedRecipes = [...currentSavedRecipes, recipeId];
+        } else {
+          return prevState;
+        }
+      } else {
+        updatedSavedRecipes = currentSavedRecipes.filter(id => id !== recipeId);
+      }
+      
+      return {
+        ...prevState,
+        user: {
+          ...prevState.user,
+          recetasGuardadas: updatedSavedRecipes
+        }
+      };
+    });
+  };
   
   return (
     <AuthContext.Provider value={{
       ...authState,
       login,
-      logout
+      logout,
+      updateSavedRecipes
     }}>
       {children}
     </AuthContext.Provider>

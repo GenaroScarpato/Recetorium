@@ -97,7 +97,6 @@ const addUsuario = async (req, res) => {
 // Actualizar un usuario por ID
 const updateById = async (req, res) => {
     const { id } = req.params;
-console.log("ID del usuario a actualizar:", id); // Verifica el ID recibido
     try {
         // Verifica si se subió una nueva foto
         let fotoUrl = req.body.foto; // Se preserva la foto si no se actualiza
@@ -125,7 +124,6 @@ console.log("ID del usuario a actualizar:", id); // Verifica el ID recibido
 
             // Actualiza la foto con la nueva URL
             fotoUrl = result.secure_url;
-            console.log("URL de la nueva foto:", fotoUrl);
         }
 
         // Combina los datos del usuario con los nuevos (si hay)
@@ -137,7 +135,6 @@ console.log("ID del usuario a actualizar:", id); // Verifica el ID recibido
             res.status(404).json({ error: `Usuario con ID ${id} no encontrado` });
         }
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'Hubo un error al actualizar el usuario' });
     }
 }
@@ -182,7 +179,6 @@ const getRecetasGuardadas = async (req, res) => {
 // Guardar receta
 const save = async (req, res) => {
     const { userId, recetaId } = req.body;
-    console.log(req.body)
     try {
         // Verificar si la receta existe
         const receta = await Receta.getById(recetaId);
@@ -192,7 +188,6 @@ const save = async (req, res) => {
         
         // Verificar si ya está guardada
         const usuario = await usuarioModel.getById(userId);
-        console.log(usuario)
         if (usuario && Array.isArray(usuario.recetasGuardadas) && usuario.recetasGuardadas.includes(recetaId)) {
             return res.status(400).json({ error: 'La receta ya está guardada' });
         }
@@ -207,12 +202,9 @@ const save = async (req, res) => {
 
 // Eliminar receta guardada
 const unsave = async (req, res) => {
-    console.log("Eliminando receta guardada...")
-    const { id, recetaId } = req.params;
-    console.log("ID del usuario:", id);
-    console.log("ID de la receta a eliminar:", recetaId);
+    const { userId, recetaId } = req.body;
     try {
-        const usuarioActualizado = await usuarioModel.eliminarRecetaGuardada(id, recetaId);
+        const usuarioActualizado = await usuarioModel.eliminarRecetaGuardada(userId, recetaId);
         
         if (!usuarioActualizado) {
             return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -236,7 +228,7 @@ const getSeguidos = async (req, res) => {
 
         res.status(200).json(result.siguiendo || []); // ← importante
     } catch (error) {
-        console.error('Error al obtener seguidos:', error);
+        console.error('Erroor al obtener seguidos:', error);
         res.status(500).json({ error: 'Error al obtener seguidos' });
     }
 };
@@ -284,21 +276,22 @@ const seguirUsuario = async (req, res) => {
 
 // Dejar de seguir
 const dejarDeSeguir = async (req, res) => {
-    const { seguidorId, usuarioId } = req.params;
-    
+    const { seguidorId, usuarioId } = req.body;  // Cambié req.params a req.body
+
     try {
         const seguidor = await usuarioModel.dejarDeSeguir(seguidorId, usuarioId);
-        
+
         if (!seguidor) {
             return res.status(404).json({ error: 'Seguidor no encontrado' });
         }
-        
+
         res.status(200).json(seguidor.siguiendo);
     } catch (error) {
         console.error('Error al dejar de seguir:', error);
         res.status(500).json({ error: 'Error al dejar de seguir' });
     }
 };
+
 module.exports = {
     getUsuarios,
     getUsuarioById,

@@ -146,7 +146,7 @@ const seguirUsuario = async (seguidorId, usuarioId) => {
 const dejarDeSeguir = async (seguidorId, usuarioId) => {
     const session = await mongoose.startSession();
     session.startTransaction();
-    
+
     try {
         // Quitar de siguiendo del seguidor
         const seguidor = await Usuario.findByIdAndUpdate(
@@ -154,14 +154,14 @@ const dejarDeSeguir = async (seguidorId, usuarioId) => {
             { $pull: { siguiendo: usuarioId } },
             { new: true, session }
         );
-        
+
         // Quitar de seguidores del usuario
         await Usuario.findByIdAndUpdate(
             usuarioId,
             { $pull: { seguidores: seguidorId } },
             { session }
         );
-        
+
         await session.commitTransaction();
         return seguidor;
     } catch (error) {
