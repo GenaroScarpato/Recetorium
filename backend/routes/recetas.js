@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const {getAll, getById, deleteById, updateById, add, buscarRecetasPorIngredientes,
      buscarPorTipoComida , calcularCostoReceta, agregarPaso, obtenerRecetaConComentarios,
-      likeReceta, unlikeReceta, getLikesReceta, agregarComentario, getComentariosReceta, getMyRecipes}
+      likeReceta, unlikeReceta, getLikesReceta, agregarComentario, getComentariosReceta, getMyRecipes, getUserRecipes}
      = require("../controllers/recetaController");
 const { validarJwt, validarAdmin } = require('../middlewares/validation');
 
@@ -11,6 +11,7 @@ router.post('/buscarPorIngredientes', buscarRecetasPorIngredientes);
 router.post('/buscarPorTipoComida', buscarPorTipoComida);
 router.get('/calcularCostoReceta/:id', calcularCostoReceta);
 router.get('/getMyRecipes', [validarJwt], getMyRecipes);
+router.get('/getUserRecipes/:id', [validarJwt], getUserRecipes);
 router.get('/', getAll);
 router.get('/all', getAll);
 router.get('/:id', getById);

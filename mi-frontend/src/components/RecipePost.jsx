@@ -5,6 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import '../styles/RecipePost.css';
 import RecipeDetails from './RecipeDetails';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 
 const RecipePost = ({ recipe = {} }) => {
   const [commentText, setCommentText] = useState('');
@@ -148,8 +150,6 @@ const RecipePost = ({ recipe = {} }) => {
 
   const handleFollow = async (e) => {
     e.stopPropagation();
-
-    // Verifica si el usuario está autenticado
     if (!isAuthenticated) {
         navigate('/login');
         return;
@@ -220,20 +220,21 @@ const RecipePost = ({ recipe = {} }) => {
         <div className="recipe-title">{recipe.nombre}</div>
 
         <div className="post-buttons-row">
-          <button
-            className={`like-button ${isLiked ? 'liked' : ''}`}
-            onClick={handleLike}
-          >
-            {isLiked ? '❤️' : '🤍'}
-          </button>
-          <button className="comment-button">💬</button>
-          <button
-            className={`save-button ${isSaved ? 'saved' : ''}`}
-            onClick={handleSave}
-          >
-            {isSaved ? '🔖 Guardado' : '🔖 Guardar'}
-          </button>
-        </div>
+  <div className="action-buttons">
+    <button className={`like-button ${isLiked ? 'liked' : ''}`} onClick={handleLike}>
+      {isLiked ? '❤️' : '🤍'}
+    </button>
+    <button className="comment-button">💬</button>
+  </div>
+
+  <button
+    className={`save-button ${isSaved ? 'saved' : ''}`}
+    onClick={handleSave}
+  >
+    <i className={`fa${isSaved ? 's' : 'r'} fa-bookmark`}></i>
+  </button>
+</div>
+
 
         <span className="likes-count">{likesCount} Me gusta</span>
 

@@ -46,6 +46,8 @@ function App() {
             <ProfilePage />
           </PrivateRoute>
         } />
+        <Route path="/perfil/:id" element={<ProfilePage />} />
+
         <Route path="/mis-recetas" element={<MisRecetas />} />
         <Route path="/guardadas" element={<Guardadas />} />
         <Route path="/chefs" element={<ChefsPage />} />

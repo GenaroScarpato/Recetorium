@@ -367,7 +367,19 @@ const { get } = require('http');
         }
       };
       
-    
+    // Obtener recetas públicas creadas por un usuario específico (por ID)
+const getUserRecipes = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const recetas = await recetasModel.getByChefId(id);
+    res.json(recetas);
+  } catch (error) {
+    console.error('Error en getUserRecipes:', error);
+    res.status(500).json({ error: 'Error al obtener las recetas del usuario', message: error.message });
+  }
+};
+
     module.exports = {
         getAll,
         getById,
@@ -384,5 +396,6 @@ const { get } = require('http');
         getLikesReceta,
         agregarComentario,
         getComentariosReceta,
-        getMyRecipes
+        getMyRecipes,
+        getUserRecipes
     };

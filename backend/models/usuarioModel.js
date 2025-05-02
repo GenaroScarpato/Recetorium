@@ -68,10 +68,10 @@ const getRecetasGuardadas = async (userId) => {
       .populate({
         path: 'recetasGuardadas',
         select: 'nombre descripcion foto tiempoPreparacion tipoComida tipoCocina ingredientes metodoCoccion nivelDificultad ingredientePrincipal temporada pasos comentarios likes likeCount',
-      })
-      .populate({
-        path: 'recetasGuardadas.chef',
-        select: 'nombre foto' // Solo seleccionamos nombre y foto del chef
+        populate: {
+          path: 'chef',
+          select: 'username foto'
+        }
       })
       .select('recetasGuardadas');
   };

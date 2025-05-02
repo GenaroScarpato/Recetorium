@@ -306,13 +306,13 @@
   }
 }
 
-.save-button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
+.save-button i {
+  font-size: 20px;
+  color: #444;
+  transition: color 0.2s ease;
 }
 
-.save-button.saved {
-  color: #009688; /* o cualquier color que elijas */
+.save-button.saved i {
+  color: #007bff; /* color azul cuando está guardado */
 }
+

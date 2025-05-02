@@ -49,7 +49,7 @@ const recetaSchema = new mongoose.Schema({
   },
   ingredientePrincipal: {
     type: String,
-    enum: ['Carne', 'Pollo', 'Pescado', 'Verduras', 'Frutas', 'Granos', 'Mariscos'],
+    enum: ['Carne', 'Pollo', 'Pescado', 'Verduras', 'Frutas', 'Granos', 'Mariscos','Pastas'],
     required: true
   },
   temporada: {
@@ -241,6 +241,9 @@ const getByChefId = async (chefId) => {
       select: 'nombre'
     });
 };
+
+
+
 module.exports = {
   Receta,
   getAll,

@@ -1,43 +1,52 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import '../styles/ProfilePage.css';
+import UserListModal from './UserListModal';
+import RecipePost from './RecipePost';
 
 const ProfilePage = () => {
-  const { user, token } = useAuth();
+  const { id } = useParams();
+  const { user: loggedUser, token } = useAuth();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
   const [updating, setUpdating] = useState(false);
   const [seguidores, setSeguidores] = useState([]);
   const [seguidos, setSeguidos] = useState([]);
+  const [showModal, setShowModal] = useState(null);
+  const [userRecipes, setUserRecipes] = useState([]);
+  const [recipesLoading, setRecipesLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [userRes, seguidosRes, seguidoresRes] = await Promise.all([
-          axios.get(`/api/usuarios/${user.id}`),
-          axios.get(`/api/usuarios/seguidos/${user.id}`),
-          axios.get(`/api/usuarios/seguidores/${user.id}`)
+        const userId = id || loggedUser?.id;
+
+        const [userRes, seguidosRes, seguidoresRes, recipesRes] = await Promise.all([
+          axios.get(`/api/usuarios/${userId}`),
+          axios.get(`/api/usuarios/seguidos/${userId}`),
+          axios.get(`/api/usuarios/seguidores/${userId}`),
+          axios.get(`/api/recetas/getUserRecipes/${userId}`)
         ]);
+
         setUserData(userRes.data);
         setSeguidos(seguidosRes.data);
         setSeguidores(seguidoresRes.data);
+        setUserRecipes(recipesRes.data);
       } catch (error) {
         console.error("Error al cargar datos del perfil:", error);
       } finally {
         setLoading(false);
+        setRecipesLoading(false);
       }
     };
 
-    if (user?.id) {
-      fetchData();
-    }
-  }, [user]);
+    if (loggedUser) fetchData();
+  }, [id, loggedUser]);
 
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
-  };
+  const handleFileChange = (e) => setSelectedFile(e.target.files[0]);
 
   const handleImageUpload = async (e) => {
     e.preventDefault();
@@ -48,7 +57,7 @@ const ProfilePage = () => {
 
     try {
       setUpdating(true);
-      const response = await axios.patch(`/api/usuarios/${user.id}`, formData, {
+      const response = await axios.patch(`/api/usuarios/${loggedUser.id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
@@ -70,7 +79,7 @@ const ProfilePage = () => {
   const handleRemoveImage = async () => {
     try {
       setUpdating(true);
-      const response = await axios.patch(`/api/usuarios/${user.id}`, {
+      const response = await axios.patch(`/api/usuarios/${loggedUser.id}`, {
         foto: 'url_default_foto_perfil'
       }, { withCredentials: true });
 
@@ -89,9 +98,28 @@ const ProfilePage = () => {
 
   const defaultImage = 'https://res.cloudinary.com/dkpwnkhza/image/upload/v1741732506/usuarios/vwmsergnpyzw8ktvq8yg.png';
   const profileImage = userData.foto && userData.foto !== 'url_default_foto_perfil' ? userData.foto : defaultImage;
+  const isOwnProfile = !id || id === loggedUser.id;
 
   return (
     <div className="profile-page-container">
+      {showModal === 'seguidores' && (
+        <UserListModal 
+          title="Seguidores" 
+          users={seguidores} 
+          onClose={() => setShowModal(null)} 
+        />
+      )}
+      
+      {showModal === 'seguidos' && (
+        <UserListModal 
+          title="Seguidos" 
+          users={seguidos} 
+          onClose={() => setShowModal(null)} 
+          isAuthenticated={!!loggedUser}
+          autenticatedUser={loggedUser}
+        />
+      )}
+
       <div className="profile-header">
         <div className="profile-avatar-wrapper">
           <img
@@ -99,28 +127,34 @@ const ProfilePage = () => {
             alt="Foto de perfil"
             className="profile-avatar-large"
           />
-          <div className="avatar-overlay">
-            <label htmlFor="fileInput" className="icon-button edit-icon">✏️</label>
-            <button className="icon-button delete-icon" onClick={handleRemoveImage}>🗑️</button>
-            <input
-              id="fileInput"
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-            />
-          </div>
+
+          {isOwnProfile && (
+            <div className="avatar-overlay">
+              <label htmlFor="fileInput" className="icon-button edit-icon">✏️</label>
+              <button className="icon-button delete-icon" onClick={handleRemoveImage}>🗑️</button>
+              <input
+                id="fileInput"
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+            </div>
+          )}
         </div>
 
         <h1>{userData.username}</h1>
 
-        {/* NUEVA SECCIÓN: Seguidores y Seguidos */}
         <div className="followers-summary">
-          <span><strong>{seguidores.length}</strong> seguidores</span>
-          <span><strong>{seguidos.length}</strong> seguidos</span>
+          <span onClick={() => setShowModal('seguidores')} style={{ cursor: 'pointer' }}>
+            <strong>{seguidores.length}</strong> seguidores
+          </span>
+          <span onClick={() => setShowModal('seguidos')} style={{ cursor: 'pointer' }}>
+            <strong>{seguidos.length}</strong> seguidos
+          </span>
         </div>
 
-        {selectedFile && (
+        {isOwnProfile && selectedFile && (
           <form onSubmit={handleImageUpload} className="upload-form">
             <button type="submit" disabled={updating}>
               {updating ? 'Actualizando...' : 'Guardar nueva foto'}
@@ -134,7 +168,7 @@ const ProfilePage = () => {
           <h2>Información Personal</h2>
           <div className="detail-row">
             <span className="detail-label">Nombre:</span>
-            <span className="detail-value">{userData.nombre || 'No especificado'}</span>
+            <span className="detail-value">{userData.username || 'No especificado'}</span>
           </div>
           <div className="detail-row">
             <span className="detail-label">Rol:</span>
@@ -142,23 +176,22 @@ const ProfilePage = () => {
           </div>
           <div className="detail-row">
             <span className="detail-label">Email:</span>
-            <span className="detail-value">{userData.email}</span>
+            <span className="detail-value">{userData.username}@Recetorium.com</span>
           </div>
         </section>
 
         <section className="profile-section">
-          <h2>Mis Recetas</h2>
-          {userData.recetasCreadas?.length > 0 ? (
+          <h2>Recetas de {userData.username}</h2>
+          {recipesLoading ? (
+            <div className="loading">Cargando recetas...</div>
+          ) : userRecipes.length > 0 ? (
             <div className="recipes-grid">
-              {userData.recetasCreadas.map(recipe => (
-                <div key={recipe._id} className="recipe-card">
-                  <h3>{recipe.nombre}</h3>
-                  <p>{recipe.descripcion?.substring(0, 100)}...</p>
-                </div>
+              {userRecipes.map(recipe => (
+                <RecipePost key={recipe._id} recipe={recipe} />
               ))}
             </div>
           ) : (
-            <p>No has creado ninguna receta aún.</p>
+            <p>Este usuario no ha creado ninguna receta aún.</p>
           )}
         </section>
       </div>
