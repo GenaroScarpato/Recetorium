@@ -12,6 +12,7 @@ const Misguardadas = () => {
   const [savedRecipes, setSavedRecipes] = useState([]);
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchSavedRecipes = async () => {
@@ -36,7 +37,7 @@ const Misguardadas = () => {
 
   return (
     <div className="saved-recipes-page">
-      <Header />
+      <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
   
       <div className="content-wrapper">
         <Sidebar />

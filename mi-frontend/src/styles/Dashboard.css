@@ -185,9 +185,13 @@
 }
 
 .suggestions-header span {
-  color: #666;
+  color: #ff6f61; /* Color vibrante para resaltar */
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid #ff6f61; /* Subrayado del texto */
 }
 
 .suggestions-header button {
@@ -204,21 +208,61 @@
   flex-direction: column;
   gap: 15px;
 }
-
-.chef-card {
+/* Carta del chef */
+.dashboard-chef-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animación suave */
 }
 
-.chef-avatar img {
+.dashboard-chef-card:hover {
+  transform: translateY(-5px); /* Levanta ligeramente la carta */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+  cursor: pointer; /* Cambia el cursor para mostrar interactividad */
+}
+
+.dashboard-chef-avatar img {
   width: 40px;
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
   margin-right: 12px;
   border: 1px solid #eee;
+  transition: transform 0.3s ease; /* Animación suave */
 }
+
+.dashboard-chef-card:hover .dashboard-chef-avatar img {
+  transform: scale(1.1); /* Aumenta ligeramente el tamaño de la foto */
+}
+
+/* Agregar una transición sutil para los detalles del chef */
+.chef-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: color 0.3s ease; /* Transición suave del texto */
+}
+
+.dashboard-chef-card:hover .chef-info .chef-username {
+  color: #455c74; /* Cambio de color en el nombre del chef al hacer hover */
+}
+
+.dashboard-chef-card:hover .chef-info .chef-followers {
+  color: #888; /* Mantener un color neutro en los seguidores */
+}
+
+
+.dashboard-chef-avatar img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+  border: 1px solid #eee;
+
+}
+
 
 .chef-info {
   flex: 1;
@@ -336,4 +380,25 @@
   .footer {
     padding: 2rem 5% 1.5rem;
   }
+}
+.auth-message {
+  position: fixed;
+  top: 80px; /* ajustá según tu Header */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #f52c2c;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  z-index: 1000;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: fadeInOut 2.5s ease-in-out forwards;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -10px); }
+  10% { opacity: 1; transform: translate(-50%, 0); }
+  90% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -10px); }
 }

@@ -7,8 +7,9 @@ import Footer from './Footer';
 import Modal from './ModalReceta';
 import RecipeDetails from './RecipeDetails'; // Asegúrate de que este componente esté disponible
 import styles from '../styles/MisRecetas.module.css';
-
+import { useNavigate } from 'react-router-dom';
 const MisRecetas = () => {
+  const navigate = useNavigate();
   const [recetas, setRecetas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,7 +46,7 @@ const MisRecetas = () => {
   }, [user, isAuthenticated]);
 
   const handleEdit = (id) => {
-    window.location.href = `/editar-receta/${id}`;
+    navigate(`/editar-receta/${id}`); // ✅ Navegación fluida sin recarga
   };
 
   const handleDelete = async (id) => {
@@ -106,7 +107,7 @@ const MisRecetas = () => {
       if (err.response?.data?.message) {
         alert(`Error: ${err.response.data.message}`);
       } else {
-        alert('No se pudo agregar la receta (error inesperado)');
+        alert('No se pudo agregar la rece ta (error inesperado)');
       }
     }
   };

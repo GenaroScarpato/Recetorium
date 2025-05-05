@@ -7,6 +7,25 @@ const NavigationSidebar = () => {
 
   if (isLoading) return null; // o un spinner si querés
 
+  // Si el usuario no está logueado, solo mostrar "Inicio"
+  if (!user) {
+    return (
+      <div className="left-column">
+        <h2>RECETORIUM</h2>
+        <nav className="navigation-menu">
+          <ul className="navigation-menu">
+            <li>
+              <Link to="/dashboard" className="nav-link">
+                <span className="icon">🏠</span> Inicio
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    );
+  }
+
+  // Si el usuario está logueado, mostrar todas las opciones
   const esChef = user?.role === 'CHEF';
 
   return (
@@ -50,4 +69,3 @@ const NavigationSidebar = () => {
 };
 
 export default NavigationSidebar;
-    

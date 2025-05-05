@@ -1,12 +1,8 @@
 const fileUpload = require('express-fileupload'); // Para manejar la subida de archivos
-const cloudinary = require('./config/cloudinaryConfig'); // Importa la configuración de Cloudinary
 const express = require('express');
 const mongoose = require('mongoose');
-const ingredientesRoutes = require('./routes/ingredientes');
-const usuariosRoutes = require('./routes/usuarios');
-const recetasRoutes = require('./routes/recetas');
-const comentariosRoutes = require('./routes/comentarios');
-const cors = require('cors'); // Asegúrate de instalarlo: npm install cors
+
+const cors = require('cors'); 
 const cookieParser = require('cookie-parser'); // Middleware para manejar cookies
 
 class Server {
@@ -50,12 +46,13 @@ class Server {
     conectarABD() {
         mongoose.connect(process.env.MONG_URI)
             .then(() => {
-                console.log('Connecting to the database...', process.env.PORT);
+                console.log('✅ Conectado a la base de datos en el puerto', process.env.PORT);
             })
             .catch((err) => {
-                console.log(`error connecting to the database ${err}`);
+                console.error('❌ Error al conectar con la base de datos:', err.message);
             });
     }
+
 }
 
 module.exports = Server;

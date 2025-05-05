@@ -16,7 +16,7 @@ router.get('/', getAll);
 router.get('/all', getAll);
 router.get('/:id', getById);
 router.delete('/:id',[validarJwt], deleteById);
-router.patch('/:id', updateById)
+router.patch('/:id',[validarJwt], updateById)
 router.post('/',[validarJwt], add);
 
  

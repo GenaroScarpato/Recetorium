@@ -301,6 +301,7 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
                   <option value="Frutas">Frutas</option>
                   <option value="Granos">Granos</option>
                   <option value="Mariscos">Mariscos</option>
+                  <option value="Pastas">Pastas</option>
                 </select>
               </div>
 

@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
             user: {
               username: response.data.user.username,
               role: response.data.user.role,
-              id: response.data.user.id,
+              id: response.data.user.id,  
               foto: response.data.user.foto || 'https://res.cloudinary.com/dkpwnkhza/image/upload/v1741732506/usuarios/vwmsergnpyzw8ktvq8yg.png',
               recetasGuardadas: response.data.user.recetasGuardadas || [],
               seguidores: response.data.user.seguidores || [],
@@ -42,13 +42,18 @@ export function AuthProvider({ children }) {
           });
         }
       } catch (error) {
-        console.error("Error verifying auth:", error);
+        if (error.response?.status !== 401) {
+          console.error("Error inesperado al verificar auth:", error);
+        }
+        // No mostramos nada si es 401
         setAuthState({
           user: null,
           isAuthenticated: false,
           isLoading: false
         });
       }
+      
+      
     };
     verifyAuth();
   }, []);

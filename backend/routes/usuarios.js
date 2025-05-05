@@ -6,7 +6,7 @@ const { validarJwt,validarAdmin } = require('../middlewares/validation');
 const router = express.Router();
 // Followers
 router.get('/seguidos/:id', getSeguidos);
-router.get('/seguidores/:id', [validarJwt], getSeguidores);
+router.get('/seguidores/:id', getSeguidores);
 router.post('/follow', [validarJwt], seguirUsuario);
 router.delete('/unfollow', [validarJwt], dejarDeSeguir);
 
@@ -17,7 +17,7 @@ router.post('/', addUsuario); // Crear un nuevo usuario
 router.delete('/:id',[validarJwt,validarAdmin], deleteById); // Eliminar un usuario por ID
 router.patch('/:id',[validarJwt], updateById);
 //guardar recetas
-router.get('/:id/recetas-guardadas', [validarJwt], getRecetasGuardadas);
+router.get('/:id/recetas-guardadas', getRecetasGuardadas);
 router.post('/save', [validarJwt], save);
 router.post('/unsave', [validarJwt], unsave);
 

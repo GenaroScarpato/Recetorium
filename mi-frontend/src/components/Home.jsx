@@ -51,8 +51,8 @@ const Home = () => {
       <main className="main-content">
         <aside className="chefs-pick">
           <div className="recipe-card">
-            <div className="recipe-badge">CHEF&apos;S PICK</div>
-            <img 
+          <div className="recipe-badge">⭐ CHEF&apos;S PICK</div>
+          <img 
               src="https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" 
               alt="Pasta Trufada con Hongos"
               className="recipe-image"

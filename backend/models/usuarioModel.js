@@ -61,7 +61,7 @@ const updateById = async (id, ingredienteActualizado) => {
 }
 
 const getChefs = async () => {
-    return await Usuario.find({ role: 'CHEF' }).select('username foto role');
+    return await Usuario.find({ role: 'CHEF' }).select('username foto role seguidores');
 };
 const getRecetasGuardadas = async (userId) => {
     return await Usuario.findById(userId)

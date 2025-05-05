@@ -9,6 +9,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 
 const RecipePost = ({ recipe = {} }) => {
   const [commentText, setCommentText] = useState('');
+  const [authMessage, setAuthMessage] = useState('');
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -26,39 +27,39 @@ const RecipePost = ({ recipe = {} }) => {
     : defaultImage;
 
   const chefUsername = recipe.chef?.username || 'Chef';
-
+  
+  const showAuthMessage = (msg) => {
+    setAuthMessage(msg);
+    setTimeout(() => setAuthMessage(''), 2500); 
+  };
+  
   useEffect(() => {
-    console.log("useEffect - recipe.likes:", recipe.likes);
-    console.log("useEffect - user.id:", user?.id);
-    
     if (recipe.likes && user?.id) {
       setIsLiked(recipe.likes.includes(user.id));
+    } else {
+      setIsLiked(false); // ← importante para usuarios no logueados
     }
-
+  
     if (user?.recetasGuardadas && recipe?._id) {
-      setIsSaved(
-        Array.isArray(user.recetasGuardadas) &&
-        user.recetasGuardadas.includes(recipe._id)
-      );
+      setIsSaved(Array.isArray(user.recetasGuardadas) && user.recetasGuardadas.includes(recipe._id));
     } else {
       setIsSaved(false);
     }
-
+  
     if (user?.siguiendo && recipe.chef?._id) {
       setIsFollowing(user.siguiendo.includes(recipe.chef._id));
     } else {
       setIsFollowing(false);
     }
   }, [recipe.likes, recipe._id, recipe.chef?._id, user]);
+  
 
   useEffect(() => {
     const fetchComments = async () => {
       try {
         setLoadingComments(true);
         setError(null);
-        console.log('Fetching comments...');
         const response = await axios.get(`/api/recetas/${recipe._id}/comentarios`);
-        console.log('Fetched comments:', response.data);
         setComments(response.data);
       } catch (error) {
         console.error('Error loading comments:', error);
@@ -76,24 +77,29 @@ const RecipePost = ({ recipe = {} }) => {
 
   const toggleDetails = (e) => {
     if (e.target.closest('button') || e.target.classList.contains('comment-input')) return;
+  
+    if (!isAuthenticated) {
+      showAuthMessage('Necesitas iniciar sesión para ver los detalles');
+      return;
+    }
+  
     setShowDetails(!showDetails);
-    console.log('Toggling details:', showDetails);
   };
+  
 
   const handleLike = async () => {
     if (!isAuthenticated) {
-      navigate('/login');
-      return;
+      showAuthMessage('Necesitas iniciar sesión para realizar esta acción');
+        return;
     }
 
     try {
       const endpoint = isLiked ? 'unlike' : 'like';
-      console.log(`Sending ${endpoint} request to /api/recetas/${recipe._id}/${endpoint}`);
       await axios.post(
         `/api/recetas/${recipe._id}/${endpoint}`,
         {
           recetaId: recipe._id,
-          userId: user.id
+          userId: user?.id
         },
         { withCredentials: true }
       );
@@ -107,18 +113,17 @@ const RecipePost = ({ recipe = {} }) => {
 
   const handleSave = async () => {
     if (!isAuthenticated) {
-      navigate('/login');
+      showAuthMessage('Necesitas iniciar sesión para guardar recetas');
       return;
     }
 
     try {
       const endpoint = isSaved ? 'unsave' : 'save';
-      console.log(`Sending ${endpoint} request to /api/usuarios/${endpoint}`);
       await axios.post(
         `/api/usuarios/${endpoint}`,
         {
           recetaId: recipe._id,
-          userId: user.id
+          userId: user?.id
         },
         { withCredentials: true }
       );
@@ -134,7 +139,7 @@ const RecipePost = ({ recipe = {} }) => {
     e.preventDefault();
 
     if (!isAuthenticated) {
-      navigate('/login');
+      showAuthMessage('Necesitas iniciar sesión para comentar');
       return;
     }
 
@@ -146,7 +151,6 @@ const RecipePost = ({ recipe = {} }) => {
         { texto: commentText , recetaId: recipe._id },
         { withCredentials: true }
       );
-      console.log('Comment submitted successfully:', response.data);
       setComments(prev => [...prev, { ...response.data, isNew: true }]);
       setCommentText('');
       setError(null);
@@ -159,18 +163,17 @@ const RecipePost = ({ recipe = {} }) => {
   const handleFollow = async (e) => {
     e.stopPropagation();
     if (!isAuthenticated) {
-        navigate('/login');
-        return;
+      showAuthMessage('Necesitas iniciar sesión para realizar esta acción');
+      return;
     }
 
     try {
         const endpoint = isFollowing ? '/unfollow' : '/follow'; 
-        console.log(`Sending ${endpoint} request to /api/usuarios/${endpoint}`);
         await axios({
             method: isFollowing ? 'delete' : 'post', 
             url: `/api/usuarios/${endpoint}`, 
             data: { 
-                seguidorId: user.id,
+                seguidorId: user?.id,
                 usuarioId: recipe.chef._id,
             },
             withCredentials: true,
@@ -190,14 +193,28 @@ const RecipePost = ({ recipe = {} }) => {
   return (
     <div className="social-post">
       <div className="recipe-post-container" onClick={toggleDetails}>
+      {authMessage && (
+  <div
+    className="auth-message"
+    onClick={() => setAuthMessage('')}
+  >
+    {authMessage}
+  </div>
+)}
+
         <div className="post-header">
-          <div
-            className="username-container"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/perfil/${recipe.chef?._id}`);
-            }}
-          >
+        <div
+  className="username-container"
+  onClick={(e) => {
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      showAuthMessage('Necesitas iniciar sesión para ver el perfil');
+      return;
+    }
+    navigate(`/perfil/${recipe.chef?._id}`);
+  }}
+>
+
             <img
               src={profileImage}
               alt={`Foto de ${chefUsername}`}

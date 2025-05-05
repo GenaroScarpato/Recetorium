@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; // Agregado useNavigate
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import '../styles/ProfilePage.css';
@@ -19,11 +19,12 @@ const ProfilePage = () => {
   const [userRecipes, setUserRecipes] = useState([]);
   const [recipesLoading, setRecipesLoading] = useState(true);
 
+  const navigate = useNavigate(); // Hook para la navegación
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const userId = id || loggedUser?.id;
-
         const [userRes, seguidosRes, seguidoresRes, recipesRes] = await Promise.all([
           axios.get(`/api/usuarios/${userId}`),
           axios.get(`/api/usuarios/seguidos/${userId}`),
@@ -43,7 +44,12 @@ const ProfilePage = () => {
       }
     };
 
-    if (loggedUser) fetchData();
+    if (loggedUser || id) {
+      fetchData();
+    } else {
+      setLoading(false); // Evita quedar en "Cargando..." si no hay sesión ni ID
+    }
+
   }, [id, loggedUser]);
 
   const handleFileChange = (e) => setSelectedFile(e.target.files[0]);
@@ -102,11 +108,20 @@ const ProfilePage = () => {
 
   return (
     <div className="profile-page-container">
+      <button 
+        className="back-button" 
+        onClick={() => navigate(-1)} 
+        style={{ position: 'absolute', top: '20px', left: '20px', background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>
+        ←
+      </button>
+
       {showModal === 'seguidores' && (
         <UserListModal 
           title="Seguidores" 
           users={seguidores} 
           onClose={() => setShowModal(null)} 
+          isAuthenticated={!!loggedUser}
+          autenticatedUser={loggedUser}
         />
       )}
       
