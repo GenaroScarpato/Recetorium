@@ -19,7 +19,7 @@ const RecipePost = ({ recipe = {} }) => {
   const [error, setError] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const navigate = useNavigate();
-  const { user, isAuthenticated, updateSavedRecipes } = useAuth();
+  const { user, isAuthenticated, updateSavedRecipes, updateFollowing } = useAuth();
 
   const defaultImage = 'https://res.cloudinary.com/dkpwnkhza/image/upload/v1741732506/usuarios/vwmsergnpyzw8ktvq8yg.png';
   const profileImage = recipe.chef?.foto && recipe.chef.foto !== 'url_default_foto_perfil'
@@ -180,6 +180,8 @@ const RecipePost = ({ recipe = {} }) => {
         });
 
         setIsFollowing(!isFollowing);
+        updateFollowing(recipe.chef._id, isFollowing ? 'unfollow' : 'follow'); // 🔄 actualiza contexto global
+
     } catch (error) {
         console.error('Error al actualizar el estado de seguimiento:', error);
         setError('Error al seguir usuario');

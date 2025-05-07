@@ -284,6 +284,11 @@ const dejarDeSeguir = async (req, res) => {
         if (!seguidor) {
             return res.status(404).json({ error: 'Seguidor no encontrado' });
         }
+//validar que el usuario este en seguidos
+  if(!seguidor.siguiendo.includes(usuarioId)) {
+    console.log("usuario no esta seguido");
+  }
+
 
         res.status(200).json(seguidor.siguiendo);
     } catch (error) {

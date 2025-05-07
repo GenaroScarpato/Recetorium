@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext'; // Adjust the path as needed
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const UserListModal = ({ title = 'Lista de Usuarios', users = [], onClose, isAuthenticated, autenticatedUser }) => {
   const navigate = useNavigate();
   const [followStatus, setFollowStatus] = useState({});
+  const { updateFollowing } = useAuth(); // asegúrate de importar el contexto
 
   useEffect(() => {
     if (autenticatedUser && autenticatedUser.siguiendo && users) {
@@ -44,6 +46,8 @@ const UserListModal = ({ title = 'Lista de Usuarios', users = [], onClose, isAut
         ...prevState,
         [userId]: !isFollowing,
       }));
+      updateFollowing(userId, isFollowing ? 'unfollow' : 'follow');
+
     } catch (error) {
       console.error('Error al actualizar el estado de seguimiento:', error);
     }
