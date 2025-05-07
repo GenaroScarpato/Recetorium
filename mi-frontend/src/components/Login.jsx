@@ -35,7 +35,10 @@ function Login() {
           username: response.data.usuario,
           role: response.data.role,
           id: response.data.id,
-          foto: response.data.foto
+          foto: response.data.foto,
+          recetasGuardadas: response.data.recetasGuardadas || [],
+          seguidores: response.data.seguidores || [],
+          siguiendo: response.data.siguiendo || []
         });
         navigate('/');
       } else {

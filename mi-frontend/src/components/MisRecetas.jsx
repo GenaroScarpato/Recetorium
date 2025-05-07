@@ -166,13 +166,13 @@
               <div className={styles.recetasGrid}>
                 {recetas.map((receta) => (
                   <div key={receta._id} className={styles.recetaCard}>
-                    <h3>{receta.nombre}</h3>
                     <img
                       src={receta.foto || '/default-recipe.jpg'}
                       alt={receta.nombre}
                       className={styles.recetaImage}
                       onClick={() => handleViewDetails(receta)}
-                    />
+                      />
+                      <h3>{receta.nombre}</h3>
                     <div className={styles.interactions}>
                       <p className={styles.likesComments}>
                         <span className={styles.likes}>

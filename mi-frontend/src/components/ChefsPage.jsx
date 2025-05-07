@@ -127,6 +127,7 @@ const ChefPage = () => {
                       </span>
                       <span className="chef-followers">{usuario.role || 'Sin rol definido'}</span>
                     </div>
+                    {usuario._id !== user.id && (
                     <button
                       className={`chef-follow-button ${usuario.isFollowing ? 'following' : ''}`}
                       onClick={(e) => {
@@ -135,7 +136,7 @@ const ChefPage = () => {
                       }}
                     >
                       {usuario.isFollowing ? 'Siguiendo' : 'Seguir'}
-                    </button>
+                    </button>)}
                   </div>
                 ))}
               </div>
