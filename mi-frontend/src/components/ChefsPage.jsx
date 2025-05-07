@@ -10,20 +10,21 @@ const ChefPage = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user } = useAuth();
+  const { user, updateFollowing } = useAuth(); // 👈 incorporamos updateFollowing
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
         setLoading(true);
         const response = await axios.get('/api/usuarios/chefs');
         const chefs = response.data;
-  
+
         const chefsConSeguimiento = chefs.map(chef => ({
           ...chef,
           isFollowing: user?.siguiendo?.includes(chef._id)
         }));
-  
+
         setUsuarios(chefsConSeguimiento);
       } catch (error) {
         console.error('Error cargando usuarios:', error);
@@ -32,12 +33,11 @@ const ChefPage = () => {
         setLoading(false);
       }
     };
-  
+
     if (user) {
       fetchUsuarios();
     }
   }, [user]);
-  
 
   const handleFollow = async (usuarioId, isFollowing) => {
     if (!user) {
@@ -49,7 +49,7 @@ const ChefPage = () => {
       const endpoint = isFollowing ? '/unfollow' : '/follow';
       await axios({
         method: isFollowing ? 'delete' : 'post',
-        url: `/api/usuarios/${endpoint}`,
+        url: `/api/usuarios${endpoint}`,
         data: {
           seguidorId: user.id,
           usuarioId,
@@ -57,6 +57,7 @@ const ChefPage = () => {
         withCredentials: true,
       });
 
+      // Actualiza la UI localmente
       setUsuarios(prevUsuarios =>
         prevUsuarios.map(usuario =>
           usuario._id === usuarioId
@@ -64,6 +65,9 @@ const ChefPage = () => {
             : usuario
         )
       );
+
+      // Actualiza el contexto global
+      updateFollowing(usuarioId, isFollowing ? 'unfollow' : 'follow');
     } catch (error) {
       console.error('Error al actualizar el estado de seguimiento:', error);
       setError('Error al seguir el chef');
@@ -126,7 +130,7 @@ const ChefPage = () => {
                     <button
                       className={`chef-follow-button ${usuario.isFollowing ? 'following' : ''}`}
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent card click from navigating
+                        e.stopPropagation();
                         handleFollow(usuario._id, usuario.isFollowing);
                       }}
                     >

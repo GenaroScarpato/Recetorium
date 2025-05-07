@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import '../styles/ModalReceta.css';
 
-const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
+const ModalReceta = ({ isOpen, onClose, onAddRecipe, isEditing, existingRecipe }) => {
   const [nombre, setNombre] = useState('');
   const [tipoComida, setTipoComida] = useState('');
   const [tipoCocina, setTipoCocina] = useState('');
@@ -22,8 +22,58 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
   useEffect(() => {
     if (isOpen) {
       fetchIngredients();
+      
+      // Si estamos editando y hay una receta existente, cargamos sus datos
+      if (isEditing && existingRecipe) {
+        setNombre(existingRecipe.nombre);
+        setTipoComida(existingRecipe.tipoComida);
+        setTipoCocina(existingRecipe.tipoCocina);
+        setMetodoCoccion(existingRecipe.metodoCoccion);
+        setTiempoPreparacion(existingRecipe.tiempoPreparacion);
+        setNivelDificultad(existingRecipe.nivelDificultad);
+        setIngredientePrincipal(existingRecipe.ingredientePrincipal);
+        setTemporada(existingRecipe.temporada);
+        
+        // Convertir ingredientes al formato esperado por el modal
+        const formattedIngredients = Array.isArray(existingRecipe.ingredientes)
+        ? existingRecipe.ingredientes.map(ing => ({
+            ingrediente: ing.ingrediente?._id || ing.ingrediente || '',
+            cantidad: ing.cantidad || '',
+            unidad: ing.unidad || ''
+          }))
+        : [{ ingrediente: '', cantidad: '', unidad: '' }];
+      
+        setIngredientes(formattedIngredients.length > 0 ? formattedIngredients : [{ ingrediente: '', cantidad: '', unidad: '' }]);
+        
+        // Convertir pasos al formato esperado
+        const formattedPasos = existingRecipe.pasos.map((paso, index) => ({
+          orden: index + 1,
+          descripcion: typeof paso === 'string' ? paso : paso.descripcion || ''
+        }));
+        setPasos(formattedPasos.length > 0 ? formattedPasos : [{ orden: 1, descripcion: '' }]);
+        
+        setFoto(existingRecipe.foto || '');
+      } else {
+        // Resetear el formulario si no estamos editando
+        resetForm();
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, isEditing, existingRecipe]);
+
+  const resetForm = () => {
+    setNombre('');
+    setTipoComida('');
+    setTipoCocina('');
+    setIngredientes([{ ingrediente: '', cantidad: '', unidad: '' }]);
+    setMetodoCoccion('');
+    setTiempoPreparacion('');
+    setNivelDificultad('');
+    setIngredientePrincipal('');
+    setTemporada('Todo el año');
+    setPasos([{ orden: 1, descripcion: '' }]);
+    setFoto('');
+    setError('');
+  };
 
   const fetchIngredients = async () => {
     try {
@@ -59,7 +109,6 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
 
   const handleRemovePaso = (index) => {
     const updatedPasos = pasos.filter((_, i) => i !== index);
-    // Reordenar los pasos restantes
     const reorderedPasos = updatedPasos.map((paso, i) => ({
       ...paso,
       orden: i + 1
@@ -78,7 +127,7 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
 
     // Validación básica
     if (!nombre || !tipoComida || !tipoCocina || !metodoCoccion || 
-        !tiempoPreparacion || !nivelDificultad || !ingredientePrincipal || !foto) {
+        !tiempoPreparacion || !nivelDificultad || !ingredientePrincipal) {
       setError('Todos los campos son requeridos');
       return;
     }
@@ -99,7 +148,7 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
       }
     }
 
-    const nuevaReceta = {
+    const recetaData = {
       nombre,
       tipoComida,
       tipoCocina,
@@ -113,16 +162,19 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
       nivelDificultad,
       ingredientePrincipal,
       temporada,
-      pasos,
+      pasos: pasos.map(paso => ({
+        orden: paso.orden,
+        descripcion: paso.descripcion
+      })),
       foto
     };
 
     try {
-      await onAddRecipe(nuevaReceta);
+      await onAddRecipe(recetaData, isEditing ? existingRecipe._id : null);
       onClose();
     } catch (err) {
-      console.error('Error al crear receta:', err);
-      setError('Hubo un error al crear la receta');
+      console.error('Error al guardar receta:', err);
+      setError('Hubo un error al guardar la receta');
     }
   };
 
@@ -139,10 +191,9 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
     <div className="modal-overlay">
       <div className="modal-content">
         <button className="close-button" onClick={onClose}>X</button>
-        <h2>Crear Nueva Receta</h2>
+        <h2>{isEditing ? 'Editar Receta' : 'Crear Nueva Receta'}</h2>
         {error && <p className="error-message">{error}</p>}
 
-        
         <form onSubmit={handleSubmit} className="recipe-form">
           <div className="form-section">
             <h3>Información Básica</h3>
@@ -167,7 +218,6 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
                   onChange={handleFileChange}
                   name="foto"
                   className="file-input"
-                  // Quitar el "required" del input y manejar la validación manualmente
                 />
                 <label htmlFor="file-upload" className="file-upload-button">
                   📁 Subir Imagen
@@ -195,7 +245,6 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
                 <p className="help-text">Por favor, sube una imagen para la receta.</p>
               )}
             </div>
-
 
             <div className="form-row">
               <div className="form-group">
@@ -319,7 +368,6 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
                 </select>
               </div>
             </div>
-
           </div>
 
           <div className="form-section">
@@ -435,15 +483,8 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe }) => {
             <button 
               type="submit" 
               className="submit-button"
-              onClick={(e) => {
-                // Validar la foto antes de enviar
-                if (!foto) {
-                  e.preventDefault();
-                  setError('Por favor, sube una imagen para la receta');
-                }
-              }}
             >
-              Guardar Receta
+              {isEditing ? 'Actualizar Receta' : 'Guardar Receta'}
             </button>
           </div>
         </form>
@@ -456,6 +497,13 @@ ModalReceta.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onAddRecipe: PropTypes.func.isRequired,
+  isEditing: PropTypes.bool,
+  existingRecipe: PropTypes.object
+};
+
+ModalReceta.defaultProps = {
+  isEditing: false,
+  existingRecipe: null
 };
 
 export default ModalReceta;

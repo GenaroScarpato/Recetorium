@@ -19,13 +19,13 @@ export function AuthProvider({ children }) {
         const response = await axios.get('/api/verify-auth', {
           withCredentials: true
         });
-  
+
         if (response.data?.user) {
           setAuthState({
             user: {
               username: response.data.user.username,
               role: response.data.user.role,
-              id: response.data.user.id,  
+              id: response.data.user.id,
               foto: response.data.user.foto || 'https://res.cloudinary.com/dkpwnkhza/image/upload/v1741732506/usuarios/vwmsergnpyzw8ktvq8yg.png',
               recetasGuardadas: response.data.user.recetasGuardadas || [],
               seguidores: response.data.user.seguidores || [],
@@ -45,16 +45,14 @@ export function AuthProvider({ children }) {
         if (error.response?.status !== 401) {
           console.error("Error inesperado al verificar auth:", error);
         }
-        // No mostramos nada si es 401
         setAuthState({
           user: null,
           isAuthenticated: false,
           isLoading: false
         });
       }
-      
-      
     };
+
     verifyAuth();
   }, []);
 
@@ -78,8 +76,8 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await axios.post(
-        'http://localhost:3000/api/logout', 
-        {}, 
+        'http://localhost:3000/api/logout',
+        {},
         { withCredentials: true }
       );
     } finally {
@@ -95,12 +93,11 @@ export function AuthProvider({ children }) {
   const updateSavedRecipes = (recipeId, action) => {
     setAuthState(prevState => {
       if (!prevState.user) return prevState;
-      
+
       const currentSavedRecipes = prevState.user.recetasGuardadas || [];
       let updatedSavedRecipes;
-      
+
       if (action === 'save') {
-        // Evitar duplicados
         if (!currentSavedRecipes.includes(recipeId)) {
           updatedSavedRecipes = [...currentSavedRecipes, recipeId];
         } else {
@@ -109,7 +106,7 @@ export function AuthProvider({ children }) {
       } else {
         updatedSavedRecipes = currentSavedRecipes.filter(id => id !== recipeId);
       }
-      
+
       return {
         ...prevState,
         user: {
@@ -119,13 +116,41 @@ export function AuthProvider({ children }) {
       };
     });
   };
-  
+
+  const updateFollowing = (usuarioId, action) => {
+    setAuthState(prevState => {
+      if (!prevState.user) return prevState;
+
+      const siguiendoActual = prevState.user.siguiendo || [];
+      let nuevoSiguiendo;
+
+      if (action === 'follow') {
+        if (!siguiendoActual.includes(usuarioId)) {
+          nuevoSiguiendo = [...siguiendoActual, usuarioId];
+        } else {
+          return prevState;
+        }
+      } else {
+        nuevoSiguiendo = siguiendoActual.filter(id => id !== usuarioId);
+      }
+
+      return {
+        ...prevState,
+        user: {
+          ...prevState.user,
+          siguiendo: nuevoSiguiendo
+        }
+      };
+    });
+  };
+
   return (
     <AuthContext.Provider value={{
       ...authState,
       login,
       logout,
-      updateSavedRecipes
+      updateSavedRecipes,
+      updateFollowing
     }}>
       {children}
     </AuthContext.Provider>

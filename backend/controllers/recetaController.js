@@ -43,52 +43,71 @@ const { get } = require('http');
 
     const updateById = async (req, res) => {
         const { id } = req.params;
-    
+      
         try {
-        let recetaActualizada = { ...req.body };
-    
-    
-        // Subida de nueva imagen (opcional)
-        if (req.files && req.files.foto) {
+          let recetaActualizada = { ...req.body };
+      
+          // ✅ Parsear ingredientes si vienen como string (por formData)
+          if (recetaActualizada.ingredientes && typeof recetaActualizada.ingredientes === 'string') {
+            try {
+              recetaActualizada.ingredientes = JSON.parse(recetaActualizada.ingredientes);
+            } catch (e) {
+              console.error("❌ Error al parsear ingredientes:", e);
+              return res.status(400).json({ error: 'Formato de ingredientes inválido' });
+            }
+          }
+      
+          // ✅ Parsear pasos si vienen como string (por formData)
+          if (recetaActualizada.pasos && typeof recetaActualizada.pasos === 'string') {
+            try {
+              recetaActualizada.pasos = JSON.parse(recetaActualizada.pasos);
+            } catch (e) {
+              console.error("❌ Error al parsear pasos:", e);
+              return res.status(400).json({ error: 'Formato de pasos inválido' });
+            }
+          }
+      
+          // Subida de nueva imagen (opcional)
+          if (req.files && req.files.foto) {
             const file = req.files.foto;
-    
+      
             if (!file.tempFilePath) {
-            console.error("❌ Archivo sin ruta temporal:", file);
-            return res.status(400).json({ error: 'Archivo de imagen no válido' });
+              console.error("❌ Archivo sin ruta temporal:", file);
+              return res.status(400).json({ error: 'Archivo de imagen no válido' });
             }
-    
+      
             const result = await cloudinary.uploader.upload(file.tempFilePath, {
-            folder: 'recetas',
+              folder: 'recetas',
             });
-    
+      
             fs.unlink(file.tempFilePath, (err) => {
-            if (err) {
+              if (err) {
                 console.error("⚠️ Error al eliminar archivo temporal:", err);
-            } else {
+              } else {
                 console.log("🧹 Archivo temporal eliminado:", file.tempFilePath);
-            }
+              }
             });
-    
+      
             recetaActualizada.foto = result.secure_url;
-        }
-    
-        // Actualiza solo con los campos nuevos (no mergeamos con la receta existente)
-    
-        const updatedReceta = await recetasModel.updateById(id, recetaActualizada);
-    
-        if (updatedReceta) {
+          }
+      
+          const updatedReceta = await recetasModel.updateById(id, recetaActualizada);
+      
+          if (updatedReceta) {
             res.status(200).json({
-            message: `Receta con ID ${id} actualizada correctamente`,
-            updatedReceta,
+              message: `Receta con ID ${id} actualizada correctamente`,
+              updatedReceta,
             });
-        } else {
+          } else {
             res.status(404).json({ error: `Receta con ID ${id} no encontrada` });
-        }
+          }
         } catch (error) {
-        console.error("💥 Error en PATCH updateById:", error);
-        res.status(500).json({ error: 'Error al actualizar la receta', message: error.message });
+          console.error("💥 Error en PATCH updateById:", error);
+          res.status(500).json({ error: 'Error al actualizar la receta', message: error.message });
         }
-    };
+      };
+      
+      
 
     const add = async (req, res) => {
         try {
@@ -113,7 +132,7 @@ const { get } = require('http');
           } else if (req.body.foto) {
             fotoUrl = req.body.foto;
           } else {
-            fotoUrl = 'https://ejemplo.com/imagen-predeterminada.jpg';
+            fotoUrl = 'https://res.cloudinary.com/dkpwnkhza/image/upload/v1746642712/recetas/n4hw4jtqvlakpkddio59.png';
           }
       
           // ✅ Parseo seguro de JSON.stringify en 'ingredientes' y 'pasos'

@@ -36,18 +36,28 @@
   overflow-y: auto;
 }
 
-
+/* Botón Agregar Receta */
 .agregarRecetaButton {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px;
+  background: linear-gradient(135deg, #87c7b2, #1cd99a);
+  color: #f1e7e7;
+  padding: 12px 20px;
   border: none;
-  cursor: pointer;
+  border-radius: 12px;
   font-size: 16px;
-  border-radius: 5px;
-  margin-bottom: 20px; /* Espacio para separar el botón del contenido */
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: 20px;
 }
 
+.agregarRecetaButton:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+  color: rgb(118, 118, 118);
+}
+
+/* Estilo de la grilla de recetas */
 .recetasGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* Establece 3 columnas de igual tamaño */
@@ -55,6 +65,7 @@
   width: 100%; /* Asegura que la grilla ocupe todo el ancho disponible */
 }
 
+/* Tarjetas de receta */
 .recetaCard {
   background-color: #fff;
   border: 1px solid #ddd;
@@ -73,39 +84,40 @@
   max-height: 200px; /* Limita la altura de las imágenes */
 }
 
-.actions {
-  margin-top: 10px;
-}
-
+/* Botones de editar y borrar */
 .editButton, .deleteButton {
-  margin: 5px;
-  padding: 5px 10px;
-  cursor: pointer;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
   font-size: 14px;
-  border-radius: 5px;
-  transition: background-color 0.3s;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin: 4px;
 }
 
 .editButton {
-  background-color: #2196F3;
+  background: linear-gradient(135deg, #070808, #2563eb);
   color: white;
-  border: none;
 }
 
 .editButton:hover {
-  background-color: #1976D2;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
 .deleteButton {
-  background-color: #f44336;
+  background: linear-gradient(135deg, #181414, #dc2626);
   color: white;
-  border: none;
 }
 
 .deleteButton:hover {
-  background-color: #d32f2f;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
 }
 
+/* Mensaje cuando no hay recetas */
 .noRecipesMessage {
   color: #666;
   font-size: 18px;
@@ -123,6 +135,8 @@
   font-size: 18px;
   font-weight: bold;
 }
+
+/* Iconos de Likes y Comentarios */
 .likes, .comments {
   display: inline-flex;
   align-items: center;
@@ -138,5 +152,3 @@
   margin-left: 5px;
   color: #2196f3; /* Azul para los comentarios */
 }
-
-

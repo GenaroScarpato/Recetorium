@@ -151,14 +151,6 @@ const add = async (nuevaReceta) => {
     throw new Error('Uno o más ingredientes no existen en la base de datos');
   }
 
-  // Validar rol del chef
-  if (nuevaReceta.chef) {
-    const usuarioChef = await Usuario.findById(nuevaReceta.chef);
-    if (!usuarioChef || usuarioChef.role !== 'CHEF') {
-      throw new Error('El usuario asignado no tiene rol de CHEF');
-    }
-  }
-
   const receta = new Receta(nuevaReceta);
   return await receta.save();
 };
