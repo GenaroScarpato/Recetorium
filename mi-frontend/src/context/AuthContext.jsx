@@ -11,6 +11,7 @@ export function AuthProvider({ children }) {
     isAuthenticated: false,
     isLoading: true
   });
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,6 +43,7 @@ export function AuthProvider({ children }) {
           });
         }
       } catch (error) {
+
         if (error.response?.status !== 401) {
           console.error("Error inesperado al verificar auth:", error);
         }
@@ -75,11 +77,7 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      await axios.post(
-        'http://localhost:3000/api/logout',
-        {},
-        { withCredentials: true }
-      );
+      await axios.post('/api/logout', {}, { withCredentials: true });
     } finally {
       setAuthState({
         user: null,
@@ -147,6 +145,7 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={{
       ...authState,
+      setAuthState, // <- ahora expuesto
       login,
       logout,
       updateSavedRecipes,

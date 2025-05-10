@@ -68,10 +68,10 @@ const Dashboard = () => {
   );
 
   const handleChefClick = (chefId) => {
-if (!isAuthenticated) {
-    showAuthMessage("Debes iniciar sesión para ver el perfil del chef.");
- return;
-  }
+    if (!isAuthenticated) {
+      showAuthMessage("Debes iniciar sesión para ver el perfil del chef.");
+      return;
+    }
     if (user && user.id === chefId) {
       navigate("/perfil");
     } else {
@@ -86,8 +86,8 @@ if (!isAuthenticated) {
       return;
     }
     navigate("/chefs");
-    
   };
+
   return (
     <div className="recipe-app-layout">
       {authMessage && (
@@ -103,8 +103,10 @@ if (!isAuthenticated) {
       />
 
       <div className="main-content-dashboard">
+        {/* Sidebar a la izquierda */}
         <NavigationSidebar />
 
+        {/* Contenido principal */}
         <div className="center-column">
           <div className="full-post-view">
             {loading ? (
@@ -123,7 +125,7 @@ if (!isAuthenticated) {
                   key={recipe._id}
                   recipe={recipe}
                   user={user}
-                  showAuthMessage={showAuthMessage} // ← Prop añadido
+                  showAuthMessage={showAuthMessage}
                 />
               ))
             ) : (
@@ -136,6 +138,7 @@ if (!isAuthenticated) {
           </div>
         </div>
 
+        {/* Columna de chefs recomendados */}
         <div className="right-column">
           <div className="suggestions-header">
             <span>Chefs destacados</span>

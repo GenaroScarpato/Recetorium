@@ -27,6 +27,8 @@ const NavigationSidebar = () => {
 
   // Si el usuario está logueado, mostrar todas las opciones
   const esChef = user?.role === 'CHEF';
+  const esAdmin = user?.role === 'ADMIN';
+
 
   return (
     <div className="left-column">
@@ -62,6 +64,18 @@ const NavigationSidebar = () => {
               <span className="icon">👤</span> Perfil
             </Link>
           </li>
+
+          {/* Panel de administración solo visible para admins */}
+          {esAdmin && (
+  <>
+    <li>
+      <Link to="/admin" className="nav-link">
+        <span className="icon">🧑‍💼</span> Gestionar web
+      </Link>
+    </li>
+  </>
+)}
+
         </ul>
       </nav>
     </div>

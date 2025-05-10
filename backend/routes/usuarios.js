@@ -9,15 +9,15 @@ router.get('/seguidos/:id', getSeguidos);
 router.get('/seguidores/:id', getSeguidores);
 router.post('/follow', [validarJwt], seguirUsuario);
 router.delete('/unfollow', [validarJwt], dejarDeSeguir);
-
-router.get('/chefs',getChefs); // Obtener todos los chefs
+  
+router.get('/chefs',[], getChefs); // Obtener todos los chefs
 router.get('/',[validarJwt,validarAdmin], getUsuarios); // Obtener todos los usuarios
 router.get('/:id', getUsuarioById); // Obtener un usuario por ID
 router.post('/', addUsuario); // Crear un nuevo usuario
 router.delete('/:id',[validarJwt,validarAdmin], deleteById); // Eliminar un usuario por ID
-router.patch('/:id',[validarJwt], updateById);
+router.patch('/:id',[validarJwt,validarAdmin], updateById); // Actualizar un usuario por ID
 //guardar recetas
-router.get('/:id/recetas-guardadas', getRecetasGuardadas);
+router.get('/:id/recetas-guardadas', [validarJwt],getRecetasGuardadas);
 router.post('/save', [validarJwt], save);
 router.post('/unsave', [validarJwt], unsave);
 

@@ -24,11 +24,11 @@ router.post('/:id/pasos', agregarPaso);
 router.get('/:id/completa', obtenerRecetaConComentarios);
 
 // Likes
-router.post('/:id/like', validarJwt, likeReceta);
-router.post('/:id/unlike', validarJwt, unlikeReceta);
+router.post('/:id/like', [validarJwt], likeReceta);
+router.post('/:id/unlike', [validarJwt], unlikeReceta);
 router.get('/:id/likes', getLikesReceta);
 
 // Comentarios
-router.post('/:id/comentarios', validarJwt, agregarComentario);
+router.post('/:id/comentarios', [validarJwt], agregarComentario);
 router.get('/:id/comentarios', getComentariosReceta);
 module.exports = router;

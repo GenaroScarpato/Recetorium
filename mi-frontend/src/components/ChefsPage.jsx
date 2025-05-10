@@ -10,7 +10,7 @@ const ChefPage = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user, updateFollowing } = useAuth(); // 👈 incorporamos updateFollowing
+  const { user, updateFollowing } = useAuth(); 
   const navigate = useNavigate();
 
   useEffect(() => {
