@@ -31,6 +31,23 @@ const RecipeDetails = ({
 
   const chefUsername = recipe.chef?.username || 'Chef';
 
+  const timeAgo = (dateString) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diff = Math.floor((now - date) / 1000); // en segundos
+  
+    if (diff < 60) return 'hace unos segundos';
+    if (diff < 3600) return `hace ${Math.floor(diff / 60)} min`;
+    if (diff < 86400) return `hace ${Math.floor(diff / 3600)} h`;
+    if (diff < 604800) return `hace ${Math.floor(diff / 86400)} d`;
+    
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
+  
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -115,29 +132,31 @@ const RecipeDetails = ({
 
           {/* LADO DERECHO */}
           <div className="recipe-right">
-            <div className="recipe-comments-section">
-              <h2>Comentarios</h2>
-              <div className="comments-list">
-                {comments.length > 0 ? (
-                  comments.map((comment) => (
-                    <div key={comment._id} className="comment">
-                      <img
-                        src={comment.usuarioId?.foto || defaultImage}
-                        alt={`Foto de ${comment.usuarioId?.username || 'Usuario'}`}
-                        className="comment-avatar"
-                      />
-                      <div className="comment-content">
-                        <span className="comment-username">
-                          {comment.usuarioId?.username || 'Usuario'}
-                        </span>
-                        <p className="comment-text">{comment.texto}</p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="no-comments">No hay comentarios aún</p>
-                )}
-              </div>
+          <div className="rc-comments-section">
+  <h2>Comentarios</h2>
+  <div className="rc-comments-list">
+    {comments.length > 0 ? (
+      comments.map((comment) => (
+        <div key={comment._id} className="rc-comment">
+          <img
+            src={comment.usuarioId?.foto || defaultImage}
+            alt={`Foto de ${comment.usuarioId?.username || 'Usuario'}`}
+            className="rc-avatar"
+          />
+          <div className="rc-content">
+            <div className="rc-header-row">
+              <span className="rc-username">{comment.usuarioId?.username || 'Usuario'}</span>
+              <span className="rc-time">{timeAgo(comment.fecha)}</span>
+            </div>
+            <p className="rc-text">{comment.texto}</p>
+          </div>
+        </div>
+      ))
+    ) : (
+      <p className="rc-no-comments">No hay comentarios aún</p>
+    )}
+  </div>
+
 
               <form onSubmit={onCommentSubmit} className="comment-form">
                 <input

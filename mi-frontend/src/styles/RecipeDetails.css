@@ -64,13 +64,14 @@
 }
 
 .user-info {
-  display: flex;
+  display: flex !important;
+  flex-direction: row !important;
   align-items: center;
   gap: 10px;
-  
 }
 
-.user-avatar {
+.user-info img {
+  display: inline-block !important;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -78,9 +79,11 @@
 }
 
 .username {
+  display: inline-block !important;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14px;
 }
+
 
 /* Imagen de la receta */
 .recipe-image-container {
@@ -288,4 +291,69 @@
   font-size: 14px;
   padding: 0 16px;
   margin-bottom: 8px;
+}
+
+.rc-comments-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.rc-comments-list {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.rc-comment {
+  display: flex;
+  gap: 10px;
+  padding: 6px;
+  border-radius: 6px;
+  background-color: #f1f1f1;
+  margin-bottom: 6px;
+}
+
+.rc-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.rc-content {
+  flex: 1;
+}
+
+.rc-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.rc-username {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.rc-time {
+  font-size: 11px;
+  color: #888;
+  white-space: nowrap;
+  margin-left: 10px;
+}
+
+.rc-text {
+  font-size: 12px;
+  margin-top: 2px;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.rc-no-comments {
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+  padding: 1rem;
 }

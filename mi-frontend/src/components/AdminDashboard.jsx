@@ -163,7 +163,16 @@ const AdminDashboard = () => {
                           <div key={c._id} className="admin-comment-item">
                             <div className="admin-comment-content">
                               <p>{c.texto}</p>
-                              <small>{new Date(c.createdAt).toLocaleString()}</small>
+                              <small>
+  {new Date(c.fecha).toLocaleDateString('es-AR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })}
+</small>
+
                             </div>
                             <button
                               className="admin-btn red"
