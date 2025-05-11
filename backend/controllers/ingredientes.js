@@ -71,23 +71,24 @@ const updateById = async (req, res) => {
 
 const add = async (req, res) => {
     try {
-        const { nombre } = req.body; // Obtiene el nombre del ingrediente del cuerpo de la petición
+        let { nombre } = req.body;
 
-        // Verificar si el ingrediente ya existe en la base de datos
-        const ingredienteExistente = await ingredientesModel.getByName(nombre); // Llama a la función para buscar por nombre
+        // Normalizar
+        nombre = nombre.trim().toLowerCase();
+        const nombreCapitalizado = nombre.charAt(0).toUpperCase() + nombre.slice(1);
+
+        
+        const ingredienteExistente = await ingredientesModel.getByName(nombre);
         if (ingredienteExistente) {
-            return res.status(400).json({
-                message: 'El ingrediente ya existe'
-            });
+            return res.status(400).json({ message: 'El ingrediente ya existe' });
         }
 
-        // Si no existe, agregar el nuevo ingrediente
-        const nuevoIngrediente = req.body;
-        const ingredienteAgregado = await ingredientesModel.add(nuevoIngrediente);
+        // Guardar con nombre capitalizado
+        const ingredienteAgregado = await ingredientesModel.add({ nombre: nombreCapitalizado });
 
         res.status(201).json({
             message: 'Ingrediente agregado exitosamente',
-            ingrediente: ingredienteAgregado // Retorna el ingrediente agregado
+            ingrediente: ingredienteAgregado
         });
     } catch (error) {
         res.status(500).json({
@@ -100,39 +101,35 @@ const add = async (req, res) => {
 // METODO ADD PARA AGREGAR MULTIPLES INGREDIENTES EN UNA SOLA PETICIÓN
 const addMany = async (req, res) => {
     try {
-        const nuevosIngredientes = req.body; // Obtiene el array de ingredientes del cuerpo de la petición
+        const nuevosIngredientes = req.body;
 
-        // Verificar y agregar solo los ingredientes que no existen
         const ingredientesAgregados = await Promise.all(
-            nuevosIngredientes.map(async (nuevoIngrediente) => {
-                const { nombre } = nuevoIngrediente;
+            nuevosIngredientes.map(async (ingrediente) => {
+                let nombre = ingrediente.nombre.trim().toLowerCase();
+                const nombreCapitalizado = nombre.charAt(0).toUpperCase() + nombre.slice(1);
 
-                // Verificar si el ingrediente ya existe
                 const ingredienteExistente = await ingredientesModel.getByName(nombre);
-
                 if (!ingredienteExistente) {
-                    // Si no existe, lo agregamos a la base de datos
-                    return await ingredientesModel.add(nuevoIngrediente);
+                    return await ingredientesModel.add({ nombre: nombreCapitalizado });
                 }
-                return null; // Si existe, retornamos null
+                return null;
             })
         );
 
-        // Filtramos los valores nulos (ingredientes duplicados)
-        const ingredientesAgregadosFiltrados = ingredientesAgregados.filter(ingrediente => ingrediente !== null);
+        const filtrados = ingredientesAgregados.filter(i => i !== null);
 
-        // Respuesta con los ingredientes agregados
         res.status(201).json({
             message: 'Ingredientes agregados exitosamente',
-            ingredientes: ingredientesAgregadosFiltrados, // Lista de ingredientes agregados
+            ingredientes: filtrados
         });
     } catch (error) {
         res.status(500).json({
             message: 'Hubo un error al agregar los ingredientes',
-            error: error.message,
+            error: error.message
         });
     }
 };
+
 
 module.exports = {
     getTodos,

@@ -79,8 +79,6 @@ const getByUser = async (req, res) => {
 
 const deleteById = async (req, res) => {
     const { id } = req.params;
-    const { usuario } = req; // Obtiene el usuario del token
-
     try {
         // Primero, busca el comentario por ID
         const comentario = await comentariosModel.getById(id);
@@ -88,19 +86,8 @@ const deleteById = async (req, res) => {
         // Verifica si el comentario existe
         if (!comentario) {
             return res.status(404).json({ error: `Comentario con ID ${id} no encontrado` });
-        }
-
-        // Agrega console.log para depuración
-        
-
-        // Verifica si el usuario es el autor del comentario o un administrador
-        const comentarioUsuarioId = comentario.usuarioId._id.toString(); // Accede al _id del usuario en el comentario
-       
-        if (comentarioUsuarioId !== usuario._id.toString() && usuario.role !== 'ADMIN') {
-            return res.status(403).json({ error: 'No tienes permisos para eliminar este comentario' });
-        }
-
-        // Si pasa las verificaciones, elimina el comentario
+        }        
+        // elimina el comentario
         await comentariosModel.deleteById(id);
         res.status(200).json({ message: `Comentario con ID ${id} eliminado correctamente` });
 

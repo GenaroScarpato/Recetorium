@@ -49,8 +49,11 @@ const add = async (nuevoIngrediente) => {
 };
 
 const getByName = async (nombre) => {
-    return await Ingrediente.findOne({ nombre });
+    return await Ingrediente.findOne({
+        nombre: { $regex: new RegExp(`^${nombre.trim()}$`, 'i') }
+    });
 };
+
 
 
 module.exports = {

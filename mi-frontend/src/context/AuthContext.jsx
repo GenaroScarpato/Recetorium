@@ -12,6 +12,16 @@ export function AuthProvider({ children }) {
     isLoading: true
   });
 
+  const updateUser = (newUserData) => {
+    setAuthState(prevState => ({
+      ...prevState,
+      user: {
+        ...prevState.user,
+        ...newUserData
+      }
+    }));
+  };
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -149,7 +159,9 @@ export function AuthProvider({ children }) {
       login,
       logout,
       updateSavedRecipes,
-      updateFollowing
+      updateFollowing,
+      updateUser 
+
     }}>
       {children}
     </AuthContext.Provider>

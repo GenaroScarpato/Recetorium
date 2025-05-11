@@ -8,7 +8,7 @@ import RecipePost from './RecipePost';
 
 const ProfilePage = () => {
   const { id } = useParams();
-  const { user: loggedUser, token } = useAuth();
+  const { user: loggedUser, token,updateUser   } = useAuth();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -72,9 +72,12 @@ const ProfilePage = () => {
       });
 
       if (response.data.updatedUser) {
-        setUserData(response.data.updatedUser);
+        const updated = response.data.updatedUser;
+        setUserData(updated);
+        updateUser({ foto: updated.foto }); // 👈 actualiza el contexto global
         setSelectedFile(null);
       }
+      
     } catch (error) {
       console.error("Error al actualizar la foto:", error);
     } finally {
@@ -90,8 +93,11 @@ const ProfilePage = () => {
       }, { withCredentials: true });
 
       if (response.data.updatedUser) {
-        setUserData(response.data.updatedUser);
+        const updated = response.data.updatedUser;
+        setUserData(updated);
+        updateUser({ foto: updated.foto }); // 👈 actualiza globalmente con la default
       }
+      
     } catch (error) {
       console.error("Error al eliminar la foto:", error);
     } finally {

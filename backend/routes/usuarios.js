@@ -15,7 +15,7 @@ router.get('/',[validarJwt,validarAdmin], getUsuarios); // Obtener todos los usu
 router.get('/:id', getUsuarioById); // Obtener un usuario por ID
 router.post('/', addUsuario); // Crear un nuevo usuario
 router.delete('/:id',[validarJwt,validarAdmin], deleteById); // Eliminar un usuario por ID
-router.patch('/:id',[validarJwt,validarAdmin], updateById); // Actualizar un usuario por ID
+router.patch('/:id',[validarJwt], updateById); // Actualizar un usuario por ID
 //guardar recetas
 router.get('/:id/recetas-guardadas', [validarJwt],getRecetasGuardadas);
 router.post('/save', [validarJwt], save);
