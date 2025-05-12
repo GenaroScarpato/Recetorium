@@ -300,11 +300,16 @@
     width: 100%;
     height: auto;
     border-right: none;
+    position: relative;
   }
 
   .post-image {
-    height: 250px;
-    
+    position: relative; /* CAMBIÁ ESTO de absolute a relative */
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
   }
 
   .post-content-container {
@@ -324,6 +329,7 @@
     font-size: 16px;
   }
 }
+
 
 .save-button i {
   font-size: 20px;

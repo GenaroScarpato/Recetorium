@@ -78,7 +78,7 @@ const ModalReceta = ({ isOpen, onClose, onAddRecipe, isEditing, existingRecipe }
   const fetchIngredients = async () => {
     try {
       setLoadingIngredients(true);
-      const response = await axios.get('http://localhost:3000/api/ingredientes');
+      const response = await axios.get('/api/ingredientes');
       setAllIngredients(response.data);
     } catch (err) {
       console.error('Error al cargar ingredientes:', err);

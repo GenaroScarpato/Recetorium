@@ -12,6 +12,7 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [recipes, setRecipes] = useState([]);
   const [recommendedChefs, setRecommendedChefs] = useState([]);
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [authMessage, setAuthMessage] = useState(""); // ← authMessage añadido
@@ -29,7 +30,7 @@ const Dashboard = () => {
       try {
         setLoading(true);
         const response = await axios.get("/api/recetas");
-        setRecipes(response.data);
+        setRecipes(response.data.reverse());
       } catch (error) {
         console.error("Error cargando recetas:", error);
         setError("No se pudieron cargar las recetas. Por favor intenta nuevamente.");

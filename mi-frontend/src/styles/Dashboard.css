@@ -7,16 +7,7 @@
   flex-direction: column;
 }
 
-/* Header */
-.header {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: 75px;
-  z-index: 1000;
-  background: white;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
+
 
 /* Contenedor principal */
 .main-content-dashboard {
@@ -356,26 +347,7 @@
 }
 
 @media (max-width: 900px) {
-  .main-content-dashboard {
-    flex-direction: column;
-    padding: 75px 20px 0;
-  }
-
-  .left-column,
-  .right-column {
-    position: static;
-    width: 100%;
-    height: auto;
-    margin: 10px 0;
-  }
-
-  .center-column {
-    margin: 0;
-    width: 100%;
-    padding: 15px;
-    min-height: auto;
-    padding-bottom: 50px;
-  }
+ 
   
   .footer {
     padding: 2rem 5% 1.5rem;
@@ -403,21 +375,38 @@
   100% { opacity: 0; transform: translate(-50%, -10px); }
 }
 
-/* Header */
-.header {
-  position: fixed;
-  top: 0;
+
+
+/* Ajustar el main content para móviles */
+.main-content-dashboard {
+  display: flex;
+  max-width: 1400px;
+  margin: 0 auto;
   width: 100%;
-  height: 75px;
-  z-index: 1000;
-  background: white;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  flex: 1;
+  position: relative;
+  background-color: #f8f9fa;
 }
 
-/* Responsivo: Eliminar el position fixed en pantallas pequeñas */
-@media (max-width: 768px) {
-  .header {
-    position: static; /* Cambia a static para que no se quede fijo en móvil */
-    box-shadow: none; /* Opcional: elimina la sombra en móvil */
+@media (max-width: 900px) {
+  .main-content-dashboard {
+    flex-direction: column;
+    padding: 0 20px; /* Ajuste importante */
+  }
+  
+  .left-column,
+  .right-column {
+    position: static;
+    width: 100%;
+    height: auto;
+    margin: 10px 0;
+  }
+  
+  .center-column {
+    margin: 0;
+    width: 100%;
+    padding: 15px;
+    min-height: auto;
+    padding-bottom: 50px;
   }
 }

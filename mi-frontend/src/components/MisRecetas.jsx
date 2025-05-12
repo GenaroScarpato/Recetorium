@@ -3,7 +3,6 @@
   import { useAuth } from '../context/AuthContext';
   import Header from './Header';
   import NavigationSideBar from './NavigationSidebar';
-  import Footer from './Footer';
   import ModalReceta from './ModalReceta';
   import RecipeDetails from './RecipeDetails';
   import styles from '../styles/MisRecetas.module.css';
@@ -209,7 +208,6 @@
             )}
           </div>
         </div>
-        <Footer />
     
         {/* Modal de detalles de receta */}
         {showDetails && selectedRecipe && (
