@@ -6,7 +6,7 @@ import App from './App.jsx';
 
 // Configuración global de Axios
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = 'http://localhost:3000'; // Opcional: establece la URL base
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

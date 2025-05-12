@@ -15,14 +15,21 @@ class Server {
     }
 
     listen() {
-        this.app.listen(this.port, () => {
+this.app.listen(this.port, '0.0.0.0', () => {
             console.log(`Server is listening on port ${this.port}`);
         });
     }
 
     cargarMiddlewares() {
         this.app.use(cors({
-            origin: 'http://localhost:5173', // Cambia este valor por la URL de tu frontend
+origin: (origin, callback) => {
+    const allowlist = ['http://localhost:5173', 'http://192.168.0.231:5173'];
+    if (!origin || allowlist.includes(origin)) {
+        callback(null, true);
+    } else {
+        callback(new Error('Not allowed by CORS'));
+    }
+},
             methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Métodos permitidos
             allowedHeaders: ['Content-Type', 'Authorization', 'x-token'], // Cabeceras permitidas
             credentials: true, // Permitir el envío de cookies
@@ -33,6 +40,8 @@ class Server {
             useTempFiles: true, // Guarda los archivos en una ubicación temporal
             tempFileDir: './tmp/', // Carpeta temporal para guardar los archivos
         }));
+        this.app.use('/uploads', express.static('uploads'));
+
     }
 
     cargarRutas() {
