@@ -63,7 +63,7 @@ const Home = () => {
               Una delicia cremosa con hongos silvestres, trufa negra rallada y un toque de vino blanco. 
               <strong> Consejo del chef:</strong> Sirve con parmesano fresco.
             </p>
-            <Link to="/receta/1" className="recipe-link">Ver receta paso a paso →</Link>
+            <Link to="/dashboard" className="recipe-link">Ver receta paso a paso →</Link>
           </div>
         </aside>
 
